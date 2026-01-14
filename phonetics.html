@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiPlexion - Phonetics Lab</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Navigation Menu -->
+<nav>
+  <a href="index.html">Home</a> |
+  <a href="phonetics.html">Phonetics Lab</a> |
+  <a href="morphology.html">Morphology Lab</a> |
+  <a href="syntax.html">Syntax Lab</a> |
+  <a href="semantics.html">Semantics Lab</a> |
+  <a href="pragmatics.html">Pragmatics Lab</a> |
+  <a href="discourse.html">Discourse Lab</a> |
+  <a href="about.html">About</a>
+</nav>
+<hr>
+
+<h1>Phonetics & Phonology Lab</h1>
+<p>Analyze syllable structure, consonant clusters, and C/V patterns interactively.</p>
+
+<input id="word" placeholder="Enter a word">
+<br>
+<button onclick="analyze()">Analyze</button>
+<pre id="output"></pre>
+
+<script>
+function analyze() {
+  const word = document.getElementById("word").value.toLowerCase();
+  const vowels = ['a','e','i','o','u'];
+  let cvPattern = word.split('').map(c => vowels.includes(c) ? 'V' : 'C').join('');
+  document.getElementById("output").innerText =
+    "Word: " + word + "\n" +
+    "C/V Pattern: " + cvPattern;
+}
+</script>
+
+</body>
+</html>
+
