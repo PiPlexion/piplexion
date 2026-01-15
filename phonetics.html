@@ -68,7 +68,7 @@ function analyze() {
 
   <button onclick="generateCV()">Generate C/V Pattern</button>
 
-  <pre id="ipaOutput"></pre>
+  <pre id="ipaOutput" class="result">Your C/V pattern will appear here...</pre>
 </section>
 
 <script>
@@ -129,10 +129,17 @@ function generateCV() {
 
         i++;
     }
+  
+  // Display result
+    const outputBox = document.getElementById("ipaOutput");
+    outputBox.innerText = `IPA: ${ipa}\nC/V Pattern: ${pattern}`;
 
-    document.getElementById("ipaOutput").innerText =
-        "IPA: " + ipa + "\n" +
-        "C/V Pattern: " + pattern;
+    // Make sure it’s visible and styled
+    outputBox.style.display = "block";
+    outputBox.style.background = "#eef3ff";
+    outputBox.style.padding = "15px";
+    outputBox.style.borderRadius = "8px";
+    outputBox.style.marginTop = "15px";
 }
 </script>
 
