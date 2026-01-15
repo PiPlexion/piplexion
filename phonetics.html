@@ -55,115 +55,86 @@ function analyze() {
     "Word: " + word + "\n" +
     "C/V Pattern: " + cvPattern;
 }
-</script>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>PiPlexion | IPA-based C/V Pattern</title>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
-
-    <!-- External CSS -->
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-  
-<section class="tool-box" aria-labelledby="cvPatternTitle">
-  <h2 id="cvPatternTitle">IPA-based C/V Pattern</h2>
+<!-- IPA-based C/V Pattern Tool Section -->
+<section id="ipaCvPatternTool" class="tool-box">
+  <h2>IPA-based C/V Pattern</h2>
   <p class="subtitle">
-    Phonological analysis based on IPA sounds 
+    Enter a phonetic transcription using IPA symbols. 
   </p>
 
   <label for="ipaInput">IPA Transcription</label>
-  <input type="text" id="ipaInput" aria-describedby="cvPatternDesc" placeholder="e.g. /tʃeɪndʒ/, /straɪk/, [fəˈnɛtɪks]">
-  <p id="cvPatternDesc" class="sr-only">Enter a phonetic transcription using IPA symbols. The tool will output the consonant–vowel (C/V) pattern.</p>
+  <input type="text" id="ipaInput" placeholder="e.g. /tʃeɪndʒ/, /straɪk/, [fəˈnɛtɪks]">
 
-  <button onclick="generateCV()" aria-controls="output">Generate C/V Pattern</button>
+  <button onclick="generateCV()">Generate C/V Pattern</button>
 
-  <div class="result" id="output" role="region" aria-live="polite"></div>
+  <pre id="ipaOutput"></pre>
 </section>
 
 <script>
 function generateCV() {
-    let ipa = document.getElementById("ipaInput").value;
+    let ipa = document.getElementById("ipaInput").value.trim();
 
-    // Remove slashes, brackets, spaces, stress & length marks
+    if(ipa === "") {
+        alert("Please enter an IPA transcription!");
+        return;
+    }
+
+    // Clean input: remove slashes, brackets, spaces, stress & length marks
     ipa = ipa.replace(/[\/\[\]\sˈˌː]/g, "");
 
-    /* -----------------------------
-       IPA DIPHTHONGS (single V)
-       ----------------------------- */
-    const diphthongs = [
-        "aɪ","aʊ","ɔɪ",
-        "eɪ","oʊ",
-        "ɪə","eə","ʊə"
-    ];
+    // IPA DIPHTHONGS (single V)
+    const diphthongs = ["aɪ","aʊ","ɔɪ","eɪ","oʊ","ɪə","eə","ʊə"];
 
-    /* -----------------------------
-       IPA MONOPHTHONG VOWELS
-       ----------------------------- */
-    const vowels = [
-        "i","ɪ","e","ɛ","æ","a","ɑ","ɒ","ɔ","o","ʊ","u",
-        "ʌ","ə","ɜ","ɚ","ɝ","ɐ","œ","ø","y","ɨ"
-    ];
+    // IPA MONOPHTHONG VOWELS
+    const vowels = ["i","ɪ","e","ɛ","æ","a","ɑ","ɒ","ɔ","o","ʊ","u","ʌ","ə","ɜ","ɚ","ɝ","ɐ","œ","ø","y","ɨ"];
 
-    /* -----------------------------
-       IPA AFFRICATES (single C)
-       ----------------------------- */
-    const affricates = [
-        "tʃ","dʒ","ts","dz","tɕ","dʑ","tʂ","dʐ"
-    ];
+    // IPA AFFRICATES (single C)
+    const affricates = ["tʃ","dʒ","ts","dz","tɕ","dʑ","tʂ","dʐ"];
 
     let pattern = "";
     let i = 0;
 
-    while (i < ipa.length) {
+    while(i < ipa.length){
+        let matched = false;
 
         // Check affricates first
-        let matched = false;
-        for (let aff of affricates) {
-            if (ipa.startsWith(aff, i)) {
+        for(let aff of affricates){
+            if(ipa.startsWith(aff, i)){
                 pattern += "C";
                 i += aff.length;
                 matched = true;
                 break;
             }
         }
-        if (matched) continue;
+        if(matched) continue;
 
         // Check diphthongs
-        for (let dip of diphthongs) {
-            if (ipa.startsWith(dip, i)) {
+        for(let dip of diphthongs){
+            if(ipa.startsWith(dip, i)){
                 pattern += "V";
                 i += dip.length;
                 matched = true;
                 break;
             }
         }
-        if (matched) continue;
+        if(matched) continue;
 
         // Check monophthong vowels
-        if (vowels.includes(ipa[i])) {
+        if(vowels.includes(ipa[i])){
             pattern += "V";
         } else {
-            // Everything else is consonantal
             pattern += "C";
         }
 
         i++;
     }
 
-    document.getElementById("output").innerHTML =
-        `C/V Pattern: <span class="pattern">${pattern}</span>`;
+    document.getElementById("ipaOutput").innerText =
+        "IPA: " + ipa + "\n" +
+        "C/V Pattern: " + pattern;
 }
 </script>
-
-</body>
-</html>
-
 
 <footer>
   <hr>
