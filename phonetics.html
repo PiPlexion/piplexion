@@ -6,6 +6,50 @@
 <title>PiPlexion - Phonetics Lab</title>
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="stylesheet" href="style.css">
+<style>
+  /* Style for both tool boxes */
+  .tool-box {
+    background-color: #eef3ff;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+
+  .tool-box h2 {
+    margin-top: 0;
+  }
+
+  .tool-box input {
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  .tool-box button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4b6ef6;
+    color: white;
+    cursor: pointer;
+  }
+
+  .tool-box button:hover {
+    background-color: #3a54d1;
+  }
+
+  .tool-box pre {
+    background-color: #dbe4ff;
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: monospace;
+  }
+</style>
 </head>
 <body>
 
@@ -25,28 +69,22 @@
 <h1>Phonetics & Phonology Lab</h1>
 <p>Analyze syllable structure, consonant clusters, and C/V patterns interactively.</p>
 
-<!-- C/V Pattern Tool Section -->
-<section id="cvPatternTool">
+<!-- C/V Pattern Tool -->
+<section id="cvPatternTool" class="tool-box">
   <h2>C/V Pattern</h2>
   <input id="word" placeholder="Enter a word">
   <br>
   <button onclick="analyze()">Analyze</button>
-  <pre id="output"></pre>
+  <pre id="output">Your C/V pattern will appear here...</pre>
 </section>
 
-<!-- IPA-based C/V Pattern Tool Section -->
+<!-- IPA-based C/V Pattern Tool -->
 <section id="ipaCvPatternTool" class="tool-box">
   <h2>IPA-based C/V Pattern</h2>
-  <p class="subtitle">
-    Enter a phonetic transcription using IPA symbols.
-  </p>
-
-  <label for="ipaInput">IPA Transcription</label>
-  <input type="text" id="ipaInput" placeholder="e.g. /tʃeɪndʒ/, /straɪk/, [fəˈnɛtɪks]">
-
+  <input type="text" id="ipaInput" placeholder="Enter IPA transcription, e.g. /tʃeɪndʒ/">
+  <br>
   <button onclick="generateCV()">Generate C/V Pattern</button>
-
-  <pre id="ipaOutput" class="result">Your C/V pattern will appear here...</pre>
+  <pre id="ipaOutput">Your IPA C/V pattern will appear here...</pre>
 </section>
 
 <!-- Scripts -->
@@ -65,82 +103,62 @@ function analyze() {
   for (let char of word) {
     if (vowels.includes(char)) cvPattern += 'V';
     else if (consonants.includes(char)) cvPattern += 'C';
-    else cvPattern += char; // keep numbers/punctuation
+    else cvPattern += char;
   }
 
   document.getElementById("output").innerText =
-    "Word: " + word + "\n" +
-    "C/V Pattern: " + cvPattern;
+    "Word: " + word + "\nC/V Pattern: " + cvPattern;
 }
 
 function generateCV() {
-    let ipa = document.getElementById("ipaInput").value.trim();
+  let ipa = document.getElementById("ipaInput").value.trim();
+  if(ipa === "") {
+    alert("Please enter an IPA transcription!");
+    return;
+  }
 
-    if(ipa === "") {
-        alert("Please enter an IPA transcription!");
-        return;
+  ipa = ipa.replace(/[\/\[\]\sˈˌː]/g, "");
+
+  const diphthongs = ["aɪ","aʊ","ɔɪ","eɪ","oʊ","ɪə","eə","ʊə"];
+  const vowels = ["i","ɪ","e","ɛ","æ","a","ɑ","ɒ","ɔ","o","ʊ","u","ʌ","ə","ɜ","ɚ","ɝ","ɐ","œ","ø","y","ɨ"];
+  const affricates = ["tʃ","dʒ","ts","dz","tɕ","dʑ","tʂ","dʐ"];
+
+  let pattern = "";
+  let i = 0;
+
+  while(i < ipa.length){
+    let matched = false;
+
+    for(let aff of affricates){
+      if(ipa.startsWith(aff,i)){
+        pattern += "C";
+        i += aff.length;
+        matched = true;
+        break;
+      }
     }
+    if(matched) continue;
 
-    // Clean input: remove slashes, brackets, spaces, stress & length marks
-    ipa = ipa.replace(/[\/\[\]\sˈˌː]/g, "");
-
-    // IPA DIPHTHONGS (single V)
-    const diphthongs = ["aɪ","aʊ","ɔɪ","eɪ","oʊ","ɪə","eə","ʊə"];
-
-    // IPA MONOPHTHONG VOWELS
-    const vowels = ["i","ɪ","e","ɛ","æ","a","ɑ","ɒ","ɔ","o","ʊ","u","ʌ","ə","ɜ","ɚ","ɝ","ɐ","œ","ø","y","ɨ"];
-
-    // IPA AFFRICATES (single C)
-    const affricates = ["tʃ","dʒ","ts","dz","tɕ","dʑ","tʂ","dʐ"];
-
-    let pattern = "";
-    let i = 0;
-
-    while(i < ipa.length){
-        let matched = false;
-
-        // Check affricates first
-        for(let aff of affricates){
-            if(ipa.startsWith(aff, i)){
-                pattern += "C";
-                i += aff.length;
-                matched = true;
-                break;
-            }
-        }
-        if(matched) continue;
-
-        // Check diphthongs
-        for(let dip of diphthongs){
-            if(ipa.startsWith(dip, i)){
-                pattern += "V";
-                i += dip.length;
-                matched = true;
-                break;
-            }
-        }
-        if(matched) continue;
-
-        // Check monophthong vowels
-        if(vowels.includes(ipa[i])){
-            pattern += "V";
-        } else {
-            pattern += "C";
-        }
-
-        i++;
+    for(let dip of diphthongs){
+      if(ipa.startsWith(dip,i)){
+        pattern += "V";
+        i += dip.length;
+        matched = true;
+        break;
+      }
     }
+    if(matched) continue;
 
-    // Display result
-    const outputBox = document.getElementById("ipaOutput");
-    outputBox.innerText = `IPA: ${ipa}\nC/V Pattern: ${pattern}`;
+    if(vowels.includes(ipa[i])){
+      pattern += "V";
+    } else {
+      pattern += "C";
+    }
+    i++;
+  }
 
-    // Make sure it’s visible and styled
-    outputBox.style.display = "block";
-    outputBox.style.background = "#eef3ff";
-    outputBox.style.padding = "15px";
-    outputBox.style.borderRadius = "8px";
-    outputBox.style.marginTop = "15px";
+  document.getElementById("ipaOutput").innerText =
+    "IPA: " + ipa + "\nC/V Pattern: " + pattern;
 }
 </script>
 
@@ -152,16 +170,12 @@ function generateCV() {
     This web app (including text, interface, and underlying code) is licensed under a
     <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">
       Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 International License
-    </a>.
-    <br>
-    Please cite PiPlexion when using this tool for academic or educational purposes.
-    <br>
+    </a>.<br>
+    Please cite PiPlexion when using this tool for academic or educational purposes.<br>
     Website: <a href="https://piplexion.github.io" target="_blank">https://piplexion.github.io</a>
   </p>
 </footer>
 
 </body>
 </html>
-
-
 
