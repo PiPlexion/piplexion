@@ -70,20 +70,20 @@ function analyze() {
 </head>
 
 <body>
-<section id="IPA-based C/V Pattern Tool">
-<div class="tool-box">
+  
+<section id="ipaCvPatternTool">
+<pre class="tool-box">
     <h2>IPA-based C/V Pattern</h2>
-    <div class="subtitle">
+    <pre class="subtitle">
         Phonological analysis based on IPA sounds
-    </div>
 
     <label for="ipaInput">IPA Transcription</label>
-    <input type="text" id="ipaInput" placeholder="e.g. /tʃeɪndʒ/, /straɪk/, [fəˈnɛtɪks]">
+    <input type="text" id="ipaInput" placeholder="Enter IPA transcription">
 
     <button onclick="generateCV()">Generate C/V Pattern</button>
 
-    <div class="result" id="output"></div>
-</div>
+    <pre id="output"></pre>
+
 </section>
 
 <script>
