@@ -1,0 +1,2886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PiPlexion — Linguistic Tools Lab</title>
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — DEEP COSMOS FUTURISM
+═══════════════════════════════════════════════ */
+:root {
+  --bg0: #030810;
+  --bg1: #060f1e;
+  --bg2: #0a1628;
+  --bg3: #0f1e36;
+  --glass: rgba(15,30,60,0.7);
+  --glass2: rgba(0,200,255,0.06);
+  --border: rgba(0,200,255,0.18);
+  --border2: rgba(0,200,255,0.08);
+  --cyan: #00d4ff;
+  --cyan2: #00a8cc;
+  --violet: #7b2fff;
+  --violet2: #a855f7;
+  --pink: #ff2d9e;
+  --green: #00ff9d;
+  --amber: #ffb830;
+  --text: #cce8f4;
+  --text2: #7aaccc;
+  --text3: #3a6a88;
+  --white: #f0f8ff;
+  --font-head: 'Orbitron', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-body: 'DM Sans', sans-serif;
+  --r: 12px;
+  --r2: 8px;
+  --shadow: 0 8px 40px rgba(0,180,255,0.12);
+  --glow: 0 0 20px rgba(0,212,255,0.3);
+  --glow2: 0 0 40px rgba(0,212,255,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font-body);
+  background:var(--bg0);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── CANVAS BACKGROUND ── */
+#bg-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;opacity:.45;
+}
+
+/* ── LAYOUT ── */
+#app{position:relative;z-index:1;display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:240px;min-width:240px;
+  background:linear-gradient(180deg,rgba(6,15,30,.98) 0%,rgba(3,8,16,.98) 100%);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;
+  z-index:100;
+  transition:transform .3s ease;
+  backdrop-filter:blur(20px);
+}
+.sidebar-logo{
+  padding:28px 24px 20px;
+  border-bottom:1px solid var(--border2);
+}
+.logo-symbol{
+  font-family:var(--font-head);
+  font-size:1.6rem;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-.02em;
+}
+.logo-sub{
+  font-family:var(--font-mono);
+  font-size:.58rem;
+  color:var(--text3);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  margin-top:4px;
+}
+.nav-section{
+  padding:16px 12px 8px;
+  font-family:var(--font-mono);
+  font-size:.55rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--text3);
+  padding-left:16px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;
+  margin:2px 8px;
+  border-radius:var(--r2);
+  cursor:pointer;
+  transition:all .2s;
+  border:1px solid transparent;
+  font-family:var(--font-body);
+  font-size:.85rem;
+  font-weight:500;
+  color:var(--text2);
+  position:relative;
+}
+.nav-item:hover{
+  background:var(--glass2);
+  border-color:var(--border2);
+  color:var(--text);
+}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(0,212,255,.12),rgba(123,47,255,.08));
+  border-color:var(--border);
+  color:var(--cyan);
+  box-shadow:inset 0 0 20px rgba(0,212,255,.05);
+}
+.nav-item.active::before{
+  content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);
+  width:3px;height:60%;border-radius:2px;
+  background:linear-gradient(180deg,var(--cyan),var(--violet));
+}
+.nav-icon{font-size:1rem;min-width:18px;text-align:center;}
+.nav-badge{
+  margin-left:auto;
+  font-family:var(--font-mono);
+  font-size:.55rem;
+  padding:2px 6px;
+  border-radius:100px;
+  background:rgba(0,212,255,.12);
+  color:var(--cyan);
+  border:1px solid rgba(0,212,255,.2);
+}
+.sidebar-footer{
+  margin-top:auto;
+  padding:16px;
+  border-top:1px solid var(--border2);
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  color:var(--text3);
+  line-height:1.6;
+}
+
+/* ── MAIN CONTENT ── */
+#main{
+  margin-left:240px;
+  flex:1;
+  min-height:100vh;
+  padding:0;
+}
+.page{display:none;animation:fadeIn .4s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  padding:40px 48px 0;
+  border-bottom:1px solid var(--border2);
+  padding-bottom:28px;
+  background:linear-gradient(180deg,rgba(6,15,30,.8) 0%,transparent 100%);
+}
+.page-eyebrow{
+  font-family:var(--font-mono);
+  font-size:.65rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:8px;
+}
+.page-eyebrow::before{
+  content:'';width:20px;height:1px;background:var(--text3);
+}
+.page-title{
+  font-family:var(--font-head);
+  font-size:2rem;
+  font-weight:800;
+  color:var(--white);
+  letter-spacing:-.02em;
+  line-height:1.1;
+}
+.page-title span{
+  background:linear-gradient(135deg,var(--cyan),var(--violet2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.page-desc{
+  font-size:.9rem;
+  color:var(--text2);
+  margin-top:10px;
+  max-width:600px;
+  line-height:1.6;
+}
+.page-body{padding:36px 48px;}
+
+/* ── TOOL GRID ── */
+.tool-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(460px,1fr));
+  gap:24px;
+}
+.tool-grid-3{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:20px;
+}
+
+/* ── TOOL CARD ── */
+.tool-card{
+  background:var(--glass);
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  padding:24px;
+  backdrop-filter:blur(12px);
+  transition:all .25s;
+  position:relative;
+  overflow:hidden;
+}
+.tool-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:0;
+  transition:opacity .3s;
+}
+.tool-card:hover{
+  border-color:var(--border);
+  box-shadow:var(--shadow);
+  transform:translateY(-2px);
+}
+.tool-card:hover::before{opacity:1;}
+.tool-card.wide{grid-column:span 2;}
+.tool-title{
+  font-family:var(--font-head);
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--cyan);
+  letter-spacing:.05em;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.tool-title .t-icon{
+  width:28px;height:28px;
+  border-radius:6px;
+  background:rgba(0,212,255,.1);
+  border:1px solid rgba(0,212,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;
+}
+
+/* ── INPUTS ── */
+textarea, input[type=text], input[type=number], select{
+  width:100%;
+  background:rgba(6,15,30,.9);
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:.9rem;
+  padding:10px 14px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  resize:vertical;
+}
+textarea:focus, input[type=text]:focus, input[type=number]:focus, select:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 3px rgba(0,212,255,.1);
+}
+select option{background:var(--bg2);}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 20px;
+  border-radius:var(--r2);
+  font-family:var(--font-body);
+  font-size:.85rem;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  color:var(--bg0);
+  box-shadow:0 4px 16px rgba(0,212,255,.25);
+}
+.btn-primary:hover{
+  box-shadow:0 6px 24px rgba(0,212,255,.4);
+  transform:translateY(-1px);
+}
+.btn-ghost{
+  background:rgba(0,212,255,.08);
+  color:var(--cyan);
+  border:1px solid rgba(0,212,255,.2);
+}
+.btn-ghost:hover{background:rgba(0,212,255,.15);}
+.btn-violet{
+  background:linear-gradient(135deg,var(--violet),var(--violet2));
+  color:white;
+  box-shadow:0 4px 16px rgba(123,47,255,.3);
+}
+.btn-violet:hover{box-shadow:0 6px 24px rgba(123,47,255,.5);transform:translateY(-1px);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+
+/* ── OUTPUT BOX ── */
+.output{
+  margin-top:14px;
+  background:rgba(3,8,16,.9);
+  border:1px solid var(--border2);
+  border-radius:var(--r2);
+  padding:14px;
+  font-family:var(--font-mono);
+  font-size:.8rem;
+  color:var(--text);
+  line-height:1.7;
+  min-height:60px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.output .highlight{color:var(--cyan);font-weight:700;}
+.output .hl-v{color:var(--violet2);}
+.output .hl-g{color:var(--green);}
+.output .hl-a{color:var(--amber);}
+.output .hl-p{color:var(--pink);}
+
+/* ── TAGS ── */
+.tag{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:100px;
+  font-size:.72rem;
+  font-family:var(--font-mono);
+  font-weight:700;
+  margin:2px;
+}
+.tag-cyan{background:rgba(0,212,255,.12);color:var(--cyan);border:1px solid rgba(0,212,255,.25);}
+.tag-violet{background:rgba(123,47,255,.12);color:var(--violet2);border:1px solid rgba(123,47,255,.25);}
+.tag-green{background:rgba(0,255,157,.1);color:var(--green);border:1px solid rgba(0,255,157,.2);}
+.tag-amber{background:rgba(255,184,48,.1);color:var(--amber);border:1px solid rgba(255,184,48,.2);}
+.tag-pink{background:rgba(255,45,158,.1);color:var(--pink);border:1px solid rgba(255,45,158,.2);}
+
+/* ── STAT CARDS ── */
+.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;}
+.stat-box{
+  flex:1;min-width:100px;
+  background:rgba(0,212,255,.05);
+  border:1px solid rgba(0,212,255,.1);
+  border-radius:var(--r2);
+  padding:12px 16px;
+  text-align:center;
+}
+.stat-val{
+  font-family:var(--font-head);
+  font-size:1.4rem;
+  font-weight:700;
+  color:var(--cyan);
+  line-height:1;
+}
+.stat-lbl{
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  color:var(--text3);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-top:4px;
+}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem;}
+.tbl th{
+  background:rgba(0,212,255,.08);
+  border:1px solid var(--border2);
+  padding:8px 12px;
+  font-family:var(--font-mono);
+  font-size:.65rem;
+  letter-spacing:.1em;
+  color:var(--cyan);
+  text-align:left;
+  text-transform:uppercase;
+}
+.tbl td{
+  border:1px solid var(--border2);
+  padding:8px 12px;
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:.78rem;
+}
+.tbl tr:hover td{background:rgba(0,212,255,.03);}
+
+/* ── IPA GRID ── */
+.ipa-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.ipa-btn{
+  width:40px;height:40px;
+  background:rgba(0,212,255,.07);
+  border:1px solid rgba(0,212,255,.15);
+  border-radius:6px;
+  color:var(--text);
+  font-size:1.1rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+  font-family:'Segoe UI','Arial Unicode MS',sans-serif;
+}
+.ipa-btn:hover{background:rgba(0,212,255,.2);color:var(--cyan);box-shadow:var(--glow);}
+.ipa-section-label{
+  width:100%;
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  color:var(--text3);
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  padding:4px 0 2px;
+}
+
+/* ── TABS ── */
+.tab-row{display:flex;gap:4px;border-bottom:1px solid var(--border2);margin-bottom:20px;}
+.tab-btn{
+  padding:8px 16px;
+  font-family:var(--font-mono);
+  font-size:.7rem;
+  letter-spacing:.08em;
+  color:var(--text3);
+  cursor:pointer;
+  border:none;background:none;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+  text-transform:uppercase;
+}
+.tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.tab-btn:hover:not(.active){color:var(--text2);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* ── TREE VISUALIZER ── */
+.tree-wrap{
+  overflow-x:auto;
+  background:rgba(3,8,16,.9);
+  border:1px solid var(--border2);
+  border-radius:var(--r2);
+  padding:20px;
+  margin-top:12px;
+  min-height:120px;
+  font-family:var(--font-mono);
+  font-size:.82rem;
+  color:var(--text);
+}
+.tree-node{display:inline-block;text-align:center;vertical-align:bottom;padding:0 8px;}
+.tree-label{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:6px;
+  font-weight:700;
+  font-size:.78rem;
+  font-family:var(--font-mono);
+}
+.tree-label.cat-S{background:rgba(255,45,158,.15);color:var(--pink);border:1px solid rgba(255,45,158,.25);}
+.tree-label.cat-NP{background:rgba(0,212,255,.12);color:var(--cyan);border:1px solid rgba(0,212,255,.2);}
+.tree-label.cat-VP{background:rgba(0,255,157,.1);color:var(--green);border:1px solid rgba(0,255,157,.2);}
+.tree-label.cat-PP{background:rgba(255,184,48,.1);color:var(--amber);border:1px solid rgba(255,184,48,.2);}
+.tree-label.cat-AP{background:rgba(123,47,255,.15);color:var(--violet2);border:1px solid rgba(123,47,255,.25);}
+.tree-label.cat-N{background:rgba(0,212,255,.08);color:var(--cyan);}
+.tree-label.cat-V{background:rgba(0,255,157,.07);color:var(--green);}
+.tree-label.cat-word{
+  background:rgba(255,255,255,.05);
+  color:var(--text);
+  font-style:italic;
+  border:1px solid var(--border2);
+}
+.tree-children{
+  display:flex;
+  justify-content:center;
+  position:relative;
+  padding-top:20px;
+}
+.tree-children::before{
+  content:'';
+  position:absolute;
+  top:0;
+  border-top:1px solid var(--text3);
+}
+
+/* ── HOME PAGE ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  padding:60px 60px 40px;
+  position:relative;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono);
+  font-size:.7rem;
+  letter-spacing:.3em;
+  color:var(--cyan);
+  text-transform:uppercase;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.hero-eyebrow::after{content:'';flex:1;max-width:60px;height:1px;background:var(--cyan);opacity:.4;}
+.hero-title{
+  font-family:var(--font-head);
+  font-size:clamp(2.5rem,6vw,5rem);
+  font-weight:900;
+  color:var(--white);
+  line-height:1.0;
+  letter-spacing:-.03em;
+  margin-bottom:6px;
+}
+.hero-title .glitch{
+  background:linear-gradient(135deg,var(--cyan) 0%,var(--violet2) 50%,var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  font-size:1.05rem;
+  color:var(--text2);
+  max-width:500px;
+  line-height:1.7;
+  margin:16px 0 36px;
+}
+.hero-labs{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:14px;
+  max-width:900px;
+  margin-top:16px;
+}
+.lab-card{
+  background:var(--glass);
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  padding:18px;
+  cursor:pointer;
+  transition:all .25s;
+  backdrop-filter:blur(12px);
+  position:relative;
+  overflow:hidden;
+}
+.lab-card:hover{
+  border-color:var(--border);
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(0,180,255,.15);
+}
+.lab-card-icon{
+  font-size:1.8rem;
+  margin-bottom:10px;
+  display:block;
+}
+.lab-card-name{
+  font-family:var(--font-head);
+  font-size:.72rem;
+  font-weight:700;
+  color:var(--cyan);
+  letter-spacing:.05em;
+  margin-bottom:4px;
+}
+.lab-card-count{
+  font-family:var(--font-mono);
+  font-size:.62rem;
+  color:var(--text3);
+}
+.lab-card-bar{
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));
+  opacity:0;
+  transition:opacity .25s;
+}
+.lab-card:hover .lab-card-bar{opacity:1;}
+
+/* ── KWIC ── */
+.kwic-row{
+  display:flex;
+  font-family:var(--font-mono);
+  font-size:.78rem;
+  padding:5px 0;
+  border-bottom:1px solid var(--border2);
+  align-items:center;
+}
+.kwic-left{
+  flex:1;text-align:right;
+  color:var(--text2);
+  padding-right:8px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.kwic-key{
+  color:var(--cyan);
+  font-weight:700;
+  min-width:80px;
+  text-align:center;
+  padding:2px 10px;
+  background:rgba(0,212,255,.1);
+  border-radius:4px;
+}
+.kwic-right{
+  flex:1;
+  color:var(--text2);
+  padding-left:8px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+/* ── FEATURE MATRIX ── */
+.matrix-wrap{overflow-x:auto;}
+.matrix-tbl{border-collapse:collapse;font-size:.75rem;font-family:var(--font-mono);}
+.matrix-tbl th, .matrix-tbl td{
+  border:1px solid var(--border2);
+  padding:6px 10px;
+  text-align:center;
+  min-width:80px;
+}
+.matrix-tbl th{background:rgba(0,212,255,.08);color:var(--cyan);}
+.matrix-tbl td.plus{color:var(--green);}
+.matrix-tbl td.minus{color:var(--pink);}
+
+/* ── PROGRESS BAR ── */
+.prog-bar{
+  background:rgba(0,212,255,.1);
+  border-radius:100px;
+  height:6px;
+  overflow:hidden;
+  margin-top:4px;
+}
+.prog-fill{
+  height:100%;
+  border-radius:100px;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));
+  transition:width .6s ease;
+}
+
+/* ── TOOLTIP ── */
+.tip{
+  position:relative;cursor:help;
+  border-bottom:1px dashed var(--text3);
+}
+.tip::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--bg3);border:1px solid var(--border);
+  padding:6px 10px;border-radius:6px;
+  font-size:.72rem;font-family:var(--font-mono);
+  color:var(--text);white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+  z-index:100;
+}
+.tip:hover::after{opacity:1;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--cyan2);}
+
+/* ── DIVIDER ── */
+.section-divider{
+  font-family:var(--font-mono);
+  font-size:.62rem;
+  letter-spacing:.2em;
+  color:var(--text3);
+  text-transform:uppercase;
+  display:flex;align-items:center;gap:12px;
+  margin:28px 0 16px;
+}
+.section-divider::before,.section-divider::after{
+  content:'';flex:1;height:1px;background:var(--border2);
+}
+
+/* ── RANGE ── */
+input[type=range]{
+  -webkit-appearance:none;
+  width:100%;height:4px;
+  background:var(--border2);
+  border-radius:2px;outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 8px rgba(0,212,255,.6);
+}
+
+/* ── CHECKBOX ── */
+.check-row{display:flex;align-items:center;gap:8px;margin:6px 0;cursor:pointer;font-size:.85rem;}
+.check-row input{
+  width:16px;height:16px;
+  accent-color:var(--cyan);
+  cursor:pointer;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  #sidebar{transform:translateX(-100%);}
+  #sidebar.open{transform:none;}
+  #main{margin-left:0;}
+  .page-header,.page-body{padding-left:24px;padding-right:24px;}
+  .hero{padding:40px 24px;}
+  .tool-grid{grid-template-columns:1fr;}
+  .tool-card.wide{grid-column:span 1;}
+  #menu-btn{display:flex;}
+}
+#menu-btn{
+  display:none;position:fixed;top:16px;left:16px;z-index:200;
+  width:40px;height:40px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.1rem;color:var(--text);
+}
+
+/* ══ ANIMATIONS ══ */
+@keyframes pulse{0%,100%{opacity:.6;}50%{opacity:1;}}
+.pulse{animation:pulse 2s ease infinite;}
+@keyframes scanline{0%{top:-2px;}100%{top:100%;}}
+.scan-effect{overflow:hidden;position:relative;}
+.scan-effect::after{
+  content:'';position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:.3;animation:scanline 4s linear infinite;
+  pointer-events:none;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<button id="menu-btn" onclick="toggleSidebar()">☰</button>
+
+<div id="app">
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-symbol">PiPlexion</div>
+    <div class="logo-sub">Linguistic Tools Lab</div>
+  </div>
+
+  <div style="overflow-y:auto;flex:1;padding-bottom:16px;">
+    <div class="nav-section">Navigation</div>
+    <div class="nav-item active" onclick="showPage('home')">
+      <span class="nav-icon">⌂</span> Home
+    </div>
+
+    <div class="nav-section" style="margin-top:8px;">Linguistic Labs</div>
+    <div class="nav-item" onclick="showPage('phonetics')">
+      <span class="nav-icon">🔊</span> Phonetics & Phonology
+      <span class="nav-badge">8</span>
+    </div>
+    <div class="nav-item" onclick="showPage('morphology')">
+      <span class="nav-icon">🔤</span> Morphology
+      <span class="nav-badge">6</span>
+    </div>
+    <div class="nav-item" onclick="showPage('syntax')">
+      <span class="nav-icon">🌳</span> Syntax
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" onclick="showPage('semantics')">
+      <span class="nav-icon">💡</span> Semantics
+      <span class="nav-badge">6</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pragmatics')">
+      <span class="nav-icon">💬</span> Pragmatics
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" onclick="showPage('discourse')">
+      <span class="nav-icon">📝</span> Discourse
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" onclick="showPage('corpus')">
+      <span class="nav-icon">📊</span> Corpus Lab
+      <span class="nav-badge">8</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    © 2026 PiPlexion<br/>
+    CC BY-NC-ND 4.0<br/>
+    piplexion.github.io
+  </div>
+</nav>
+
+<!-- ══════════ MAIN ══════════ -->
+<main id="main">
+
+<!-- ─────────── HOME ─────────── -->
+<section id="page-home" class="page active">
+  <div class="hero scan-effect">
+    <div class="hero-eyebrow">PiPlexion v2.0 — Linguistic Tools Lab</div>
+    <div class="hero-title">
+      Explore Language<br/><span class="glitch">Scientifically.</span>
+    </div>
+    <p class="hero-sub">
+      A full-spectrum interactive linguistics workbench — from the smallest sound to the broadest discourse. Eight specialized labs, 43 tools, zero setup.
+    </p>
+
+    <div class="hero-labs">
+      <div class="lab-card" onclick="showPage('phonetics')">
+        <span class="lab-card-icon">🔊</span>
+        <div class="lab-card-name">Phonetics &amp; Phonology</div>
+        <div class="lab-card-count">8 tools</div>
+        <div class="lab-card-bar"></div>
+      </div>
+      <div class="lab-card" onclick="showPage('morphology')">
+        <span class="lab-card-icon">🔤</span>
+        <div class="lab-card-name">Morphology</div>
+        <div class="lab-card-count">6 tools</div>
+        <div class="lab-card-bar"></div>
+      </div>
+      <div class="lab-card" onclick="showPage('syntax')">
+        <span class="lab-card-icon">🌳</span>
+        <div class="lab-card-name">Syntax</div>
+        <div class="lab-card-count">5 tools</div>
+        <div class="lab-card-bar"></div>
+      </div>
+      <div class="lab-card" onclick="showPage('semantics')">
+        <span class="lab-card-icon">💡</span>
+        <div class="lab-card-name">Semantics</div>
+        <div class="lab-card-count">6 tools</div>
+        <div class="lab-card-bar"></div>
+      </div>
+      <div class="lab-card" onclick="showPage('pragmatics')">
+        <span class="lab-card-icon">💬</span>
+        <div class="lab-card-name">Pragmatics</div>
+        <div class="lab-card-count">5 tools</div>
+        <div class="lab-card-bar"></div>
+      </div>
+      <div class="lab-card" onclick="showPage('discourse')">
+        <span class="lab-card-icon">📝</span>
+        <div class="lab-card-name">Discourse</div>
+        <div class="lab-card-count">5 tools</div>
+        <div class="lab-card-bar"></div>
+      </div>
+      <div class="lab-card" onclick="showPage('corpus')">
+        <span class="lab-card-icon">📊</span>
+        <div class="lab-card-name">Corpus Lab</div>
+        <div class="lab-card-count">8 tools</div>
+        <div class="lab-card-bar"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="showPage('phonetics')">▶ Start with Phonetics</button>
+      <button class="btn btn-ghost" onclick="showPage('corpus')">📊 Jump to Corpus Lab</button>
+    </div>
+
+    <div style="margin-top:60px;display:flex;gap:32px;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:var(--cyan);">7</div>
+        <div style="font-size:.75rem;color:var(--text3);font-family:var(--font-mono);letter-spacing:.1em;">LABS</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:var(--violet2);">43+</div>
+        <div style="font-size:.75rem;color:var(--text3);font-family:var(--font-mono);letter-spacing:.1em;">TOOLS</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:var(--green);">100%</div>
+        <div style="font-size:.75rem;color:var(--text3);font-family:var(--font-mono);letter-spacing:.1em;">CLIENT-SIDE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── PHONETICS ─────────── -->
+<section id="page-phonetics" class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Lab 01</div>
+    <div class="page-title">Phonetics &amp; <span>Phonology</span></div>
+    <div class="page-desc">Analyze the sounds of language — segmental and suprasegmental properties, IPA transcription, syllable structure, and phonological patterns.</div>
+  </div>
+  <div class="page-body">
+
+    <div class="tool-grid">
+
+      <!-- IPA KEYBOARD -->
+      <div class="tool-card wide">
+        <div class="tool-title"><div class="t-icon">⌨</div> IPA Keyboard &amp; Transcriber</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:220px;">
+            <textarea id="ipa-out" rows="3" placeholder="Click IPA symbols or type here…" style="font-size:1.1rem;font-family:serif;"></textarea>
+            <div class="btn-row">
+              <button class="btn btn-ghost" onclick="document.getElementById('ipa-out').value=''">Clear</button>
+              <button class="btn btn-primary" onclick="copyText('ipa-out')">Copy</button>
+            </div>
+          </div>
+          <div style="flex:2;min-width:260px;">
+            <div id="ipa-pad">
+              <div class="ipa-section-label">Plosives</div>
+              <div class="ipa-grid">
+                <div class="ipa-btn" onclick="ipa('p')" title="voiceless bilabial plosive">p</div>
+                <div class="ipa-btn" onclick="ipa('b')" title="voiced bilabial plosive">b</div>
+                <div class="ipa-btn" onclick="ipa('t')" title="voiceless alveolar plosive">t</div>
+                <div class="ipa-btn" onclick="ipa('d')" title="voiced alveolar plosive">d</div>
+                <div class="ipa-btn" onclick="ipa('k')" title="voiceless velar plosive">k</div>
+                <div class="ipa-btn" onclick="ipa('g')" title="voiced velar plosive">g</div>
+                <div class="ipa-btn" onclick="ipa('ʔ')" title="glottal stop">ʔ</div>
+                <div class="ipa-btn" onclick="ipa('q')" title="voiceless uvular plosive">q</div>
+              </div>
+              <div class="ipa-section-label">Fricatives</div>
+              <div class="ipa-grid">
+                <div class="ipa-btn" onclick="ipa('f')">f</div>
+                <div class="ipa-btn" onclick="ipa('v')">v</div>
+                <div class="ipa-btn" onclick="ipa('θ')">θ</div>
+                <div class="ipa-btn" onclick="ipa('ð')">ð</div>
+                <div class="ipa-btn" onclick="ipa('s')">s</div>
+                <div class="ipa-btn" onclick="ipa('z')">z</div>
+                <div class="ipa-btn" onclick="ipa('ʃ')">ʃ</div>
+                <div class="ipa-btn" onclick="ipa('ʒ')">ʒ</div>
+                <div class="ipa-btn" onclick="ipa('h')">h</div>
+                <div class="ipa-btn" onclick="ipa('x')">x</div>
+                <div class="ipa-btn" onclick="ipa('ɣ')">ɣ</div>
+                <div class="ipa-btn" onclick="ipa('χ')">χ</div>
+              </div>
+              <div class="ipa-section-label">Nasals &amp; Liquids</div>
+              <div class="ipa-grid">
+                <div class="ipa-btn" onclick="ipa('m')">m</div>
+                <div class="ipa-btn" onclick="ipa('n')">n</div>
+                <div class="ipa-btn" onclick="ipa('ŋ')">ŋ</div>
+                <div class="ipa-btn" onclick="ipa('ɲ')">ɲ</div>
+                <div class="ipa-btn" onclick="ipa('l')">l</div>
+                <div class="ipa-btn" onclick="ipa('r')">r</div>
+                <div class="ipa-btn" onclick="ipa('ɾ')">ɾ</div>
+                <div class="ipa-btn" onclick="ipa('ɹ')">ɹ</div>
+                <div class="ipa-btn" onclick="ipa('ɬ')">ɬ</div>
+              </div>
+              <div class="ipa-section-label">Affricates &amp; Approximants</div>
+              <div class="ipa-grid">
+                <div class="ipa-btn" onclick="ipa('tʃ')">tʃ</div>
+                <div class="ipa-btn" onclick="ipa('dʒ')">dʒ</div>
+                <div class="ipa-btn" onclick="ipa('w')">w</div>
+                <div class="ipa-btn" onclick="ipa('j')">j</div>
+                <div class="ipa-btn" onclick="ipa('ɥ')">ɥ</div>
+              </div>
+              <div class="ipa-section-label">Vowels</div>
+              <div class="ipa-grid">
+                <div class="ipa-btn" onclick="ipa('i')">i</div>
+                <div class="ipa-btn" onclick="ipa('ɪ')">ɪ</div>
+                <div class="ipa-btn" onclick="ipa('e')">e</div>
+                <div class="ipa-btn" onclick="ipa('ɛ')">ɛ</div>
+                <div class="ipa-btn" onclick="ipa('æ')">æ</div>
+                <div class="ipa-btn" onclick="ipa('a')">a</div>
+                <div class="ipa-btn" onclick="ipa('ɑ')">ɑ</div>
+                <div class="ipa-btn" onclick="ipa('ɒ')">ɒ</div>
+                <div class="ipa-btn" onclick="ipa('ɔ')">ɔ</div>
+                <div class="ipa-btn" onclick="ipa('o')">o</div>
+                <div class="ipa-btn" onclick="ipa('ʊ')">ʊ</div>
+                <div class="ipa-btn" onclick="ipa('u')">u</div>
+                <div class="ipa-btn" onclick="ipa('ʌ')">ʌ</div>
+                <div class="ipa-btn" onclick="ipa('ə')">ə</div>
+                <div class="ipa-btn" onclick="ipa('ɜ')">ɜ</div>
+                <div class="ipa-btn" onclick="ipa('y')">y</div>
+                <div class="ipa-btn" onclick="ipa('ø')">ø</div>
+                <div class="ipa-btn" onclick="ipa('œ')">œ</div>
+              </div>
+              <div class="ipa-section-label">Diacritics &amp; Suprasegmentals</div>
+              <div class="ipa-grid">
+                <div class="ipa-btn" onclick="ipa('ː')">ː</div>
+                <div class="ipa-btn" onclick="ipa('ˈ')">ˈ</div>
+                <div class="ipa-btn" onclick="ipa('ˌ')">ˌ</div>
+                <div class="ipa-btn" onclick="ipa('.')">.</div>
+                <div class="ipa-btn" onclick="ipa('̃')">◌̃</div>
+                <div class="ipa-btn" onclick="ipa('ʰ')">ʰ</div>
+                <div class="ipa-btn" onclick="ipa('ʷ')">ʷ</div>
+                <div class="ipa-btn" onclick="ipa('↗')">↗</div>
+                <div class="ipa-btn" onclick="ipa('↘')">↘</div>
+                <div class="ipa-btn" onclick="ipa('|')">|</div>
+                <div class="ipa-btn" onclick="ipa('‖')">‖</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CV PATTERN ANALYZER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🔬</div> CV Pattern Analyzer</div>
+        <input type="text" id="cv-in" placeholder="Enter a word (e.g. strength, splash)" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="analyzeCVPattern()">Analyze</button></div>
+        <div class="output" id="cv-out">—</div>
+      </div>
+
+      <!-- SYLLABLE COUNTER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🎵</div> Syllable Analyzer</div>
+        <input type="text" id="syl-in" placeholder="Enter word or phrase…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="countSyllables()">Analyze</button></div>
+        <div class="output" id="syl-out">—</div>
+      </div>
+
+      <!-- MINIMAL PAIRS -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">⚡</div> Minimal Pair Finder</div>
+        <input type="text" id="mp-in" placeholder="Enter a word (e.g. cat, bit, pat)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="findMinimalPairs()">Find Pairs</button></div>
+        <div class="output" id="mp-out">—</div>
+      </div>
+
+      <!-- PHONEME COUNTER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🔢</div> Phoneme vs Grapheme Counter</div>
+        <input type="text" id="phon-in" placeholder="Enter a word in IPA or English…" />
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="countPhonemes()">Count</button>
+        </div>
+        <div class="output" id="phon-out">—</div>
+      </div>
+
+      <!-- DISTINCTIVE FEATURES -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📋</div> Distinctive Features Matrix</div>
+        <input type="text" id="df-in" placeholder="Enter consonants separated by spaces (e.g. p b t d k g)" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="distinctiveFeatures()">Generate Matrix</button></div>
+        <div class="output" id="df-out" style="overflow-x:auto;">—</div>
+      </div>
+
+      <!-- STRESS PATTERN -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📈</div> Stress Pattern Analyzer</div>
+        <input type="text" id="stress-in" placeholder="Enter a multi-syllable word (e.g. understanding, photography)" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="stressPattern()">Analyze Stress</button></div>
+        <div class="output" id="stress-out">—</div>
+      </div>
+
+      <!-- CONSONANT CLUSTER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🧩</div> Consonant Cluster Detector</div>
+        <input type="text" id="cc-in" placeholder="Enter word (e.g. strengths, splashed)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="clusterDetect()">Detect Clusters</button></div>
+        <div class="output" id="cc-out">—</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── MORPHOLOGY ─────────── -->
+<section id="page-morphology" class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Lab 02</div>
+    <div class="page-title">Morphology <span>Lab</span></div>
+    <div class="page-desc">Dissect word structure — morphemes, affixes, word formation processes, paradigms, and derivational patterns.</div>
+  </div>
+  <div class="page-body">
+    <div class="tool-grid">
+
+      <!-- MORPHEME SEGMENTER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">✂</div> Morpheme Segmenter</div>
+        <input type="text" id="morph-in" placeholder="Enter a complex word (e.g. unbelievable, rewriting)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="segmentMorphemes()">Segment</button></div>
+        <div class="output" id="morph-out">—</div>
+      </div>
+
+      <!-- AFFIX IDENTIFIER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🔍</div> Affix Identifier</div>
+        <input type="text" id="affix-in" placeholder="Enter a word (e.g. discomfort, international)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="identifyAffixes()">Identify</button></div>
+        <div class="output" id="affix-out">—</div>
+      </div>
+
+      <!-- WORD FORMATION -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🏗</div> Word Formation Classifier</div>
+        <input type="text" id="wf-in" placeholder="Enter a word or phrase (e.g. brunch, smog, laptop)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="classifyWordFormation()">Classify</button></div>
+        <div class="output" id="wf-out">—</div>
+      </div>
+
+      <!-- PARADIGM TABLE -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📊</div> Inflectional Paradigm Generator</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input type="text" id="para-in" placeholder="Base verb (e.g. run, eat, go)…" />
+          <select id="para-type" style="width:130px;">
+            <option value="verb">Verb</option>
+            <option value="noun">Noun</option>
+            <option value="adj">Adjective</option>
+          </select>
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="generateParadigm()">Generate</button></div>
+        <div class="output" id="para-out">—</div>
+      </div>
+
+      <!-- MORPHOLOGICAL TREE -->
+      <div class="tool-card wide">
+        <div class="tool-title"><div class="t-icon">🌳</div> Morphological Tree Builder</div>
+        <input type="text" id="mtree-in" placeholder="Enter a derived/complex word (e.g. unbelievably, internationalization)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="morphTree()">Build Tree</button></div>
+        <div class="tree-wrap" id="mtree-out">Tree will appear here…</div>
+      </div>
+
+      <!-- WORD COUNT + MORPHEME COUNT -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📐</div> Morpheme Density Analyzer</div>
+        <textarea id="mdens-in" rows="4" placeholder="Paste a sentence or short text…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="morphDensity()">Analyze</button></div>
+        <div class="output" id="mdens-out">—</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── SYNTAX ─────────── -->
+<section id="page-syntax" class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Lab 03</div>
+    <div class="page-title"><span>Syntax</span> Lab</div>
+    <div class="page-desc">Parse sentences, generate phrase structure trees, tag parts of speech, and test constituency & grammatical relationships.</div>
+  </div>
+  <div class="page-body">
+    <div class="tool-grid">
+
+      <!-- POS TAGGER -->
+      <div class="tool-card wide">
+        <div class="tool-title"><div class="t-icon">🏷</div> Part-of-Speech Tagger</div>
+        <textarea id="pos-in" rows="3" placeholder="Enter a sentence (e.g. The quick brown fox jumps over the lazy dog)…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="posTagger()">Tag</button></div>
+        <div class="output" id="pos-out">—</div>
+      </div>
+
+      <!-- PHRASE STRUCTURE TREE -->
+      <div class="tool-card wide">
+        <div class="tool-title"><div class="t-icon">🌲</div> Phrase Structure Tree (X-bar)</div>
+        <input type="text" id="pst-in" placeholder="Simple sentence: The cat sat on the mat / She gave him a book…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="phraseTree()">Generate Tree</button></div>
+        <div class="tree-wrap" id="pst-out">Tree will appear here…</div>
+      </div>
+
+      <!-- CONSTITUENCY TESTS -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🧪</div> Constituency Tests</div>
+        <input type="text" id="const-in" placeholder="Enter a sentence…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="constituencyTests()">Run Tests</button></div>
+        <div class="output" id="const-out">—</div>
+      </div>
+
+      <!-- DEPENDENCY RELATIONS -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">↔</div> Grammatical Relation Identifier</div>
+        <input type="text" id="dep-in" placeholder="Enter a simple sentence…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="gramRelations()">Identify</button></div>
+        <div class="output" id="dep-out">—</div>
+      </div>
+
+      <!-- SENTENCE TYPE CLASSIFIER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📋</div> Sentence Type Classifier</div>
+        <textarea id="stype-in" rows="3" placeholder="Enter a sentence or multiple sentences…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="classifySentences()">Classify</button></div>
+        <div class="output" id="stype-out">—</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── SEMANTICS ─────────── -->
+<section id="page-semantics" class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Lab 04</div>
+    <div class="page-title">Semantics <span>Lab</span></div>
+    <div class="page-desc">Explore meaning — lexical relations, semantic features, entailment, thematic roles, and meaning composition.</div>
+  </div>
+  <div class="page-body">
+    <div class="tool-grid">
+
+      <!-- LEXICAL RELATIONS -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🔗</div> Lexical Relations Explorer</div>
+        <input type="text" id="lex-in" placeholder="Enter a word (e.g. happy, walk, big)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="lexicalRelations()">Explore</button></div>
+        <div class="output" id="lex-out">—</div>
+      </div>
+
+      <!-- SEMANTIC FEATURES MATRIX -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📋</div> Semantic Feature Matrix Builder</div>
+        <input type="text" id="sfm-words" placeholder="Words (comma-separated): man, woman, boy, girl" />
+        <input type="text" id="sfm-feats" placeholder="Features (comma-separated): +HUMAN, +ADULT, +MALE" style="margin-top:8px;" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="semFeatureMatrix()">Build Matrix</button></div>
+        <div class="output" id="sfm-out" style="overflow-x:auto;">—</div>
+      </div>
+
+      <!-- THEMATIC ROLES -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🎭</div> Thematic Role Analyzer</div>
+        <input type="text" id="theta-in" placeholder="Enter a sentence (e.g. John gave Mary a book)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="thetaRoles()">Analyze</button></div>
+        <div class="output" id="theta-out">—</div>
+      </div>
+
+      <!-- ENTAILMENT CHECKER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">⊨</div> Entailment &amp; Presupposition</div>
+        <input type="text" id="ent-p" placeholder="Proposition P (e.g. John stopped smoking)" />
+        <input type="text" id="ent-q" placeholder="Proposition Q (e.g. John used to smoke)" style="margin-top:8px;" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="checkEntailment()">Check</button></div>
+        <div class="output" id="ent-out">—</div>
+      </div>
+
+      <!-- SEMANTIC FIELD -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🌐</div> Semantic Field Explorer</div>
+        <input type="text" id="sf-in" placeholder="Enter a word to explore its semantic field (e.g. war, love, food)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="semanticField()">Explore Field</button></div>
+        <div class="output" id="sf-out">—</div>
+      </div>
+
+      <!-- POLYSEMY/HOMONYMY -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">💎</div> Polysemy &amp; Homonymy Classifier</div>
+        <input type="text" id="poly-in" placeholder="Enter a word (e.g. bank, bat, right, date)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="polysemyCheck()">Classify</button></div>
+        <div class="output" id="poly-out">—</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── PRAGMATICS ─────────── -->
+<section id="page-pragmatics" class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Lab 05</div>
+    <div class="page-title">Pragmatics <span>Lab</span></div>
+    <div class="page-desc">Analyze language in context — speech acts, Gricean maxims, implicature, deixis, and politeness strategies.</div>
+  </div>
+  <div class="page-body">
+    <div class="tool-grid">
+
+      <!-- SPEECH ACT CLASSIFIER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🗣</div> Speech Act Classifier</div>
+        <textarea id="sa-in" rows="3" placeholder="Enter an utterance (e.g. Could you pass the salt? / I promise I'll be there.)…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="speechAct()">Classify</button></div>
+        <div class="output" id="sa-out">—</div>
+      </div>
+
+      <!-- GRICE'S MAXIMS -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📏</div> Grice's Maxims Analyzer</div>
+        <textarea id="grice-q" rows="2" placeholder="Question/context (e.g. How did the exam go?)"></textarea>
+        <textarea id="grice-a" rows="2" placeholder="Response (e.g. Well, I didn't fail.)" style="margin-top:8px;"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="griceAnalysis()">Analyze</button></div>
+        <div class="output" id="grice-out">—</div>
+      </div>
+
+      <!-- IMPLICATURE DETECTOR -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">💭</div> Implicature Detector</div>
+        <textarea id="impl-in" rows="4" placeholder="Enter a conversational exchange:&#10;A: Did you like the food?&#10;B: The presentation was lovely."></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="detectImplicature()">Detect</button></div>
+        <div class="output" id="impl-out">—</div>
+      </div>
+
+      <!-- DEIXIS FINDER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">👉</div> Deixis Identifier</div>
+        <textarea id="deix-in" rows="3" placeholder="Enter a sentence with deictic expressions (e.g. I'll meet you here tomorrow at 3pm)…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="deixisFind()">Identify</button></div>
+        <div class="output" id="deix-out">—</div>
+      </div>
+
+      <!-- POLITENESS STRATEGIES -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🤝</div> Politeness Strategy Analyzer</div>
+        <textarea id="pol-in" rows="3" placeholder="Enter an utterance (e.g. I was wondering if perhaps you might be able to help me?)…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="politenessAnalyze()">Analyze</button></div>
+        <div class="output" id="pol-out">—</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── DISCOURSE ─────────── -->
+<section id="page-discourse" class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Lab 06</div>
+    <div class="page-title">Discourse <span>Lab</span></div>
+    <div class="page-desc">Analyze text-level linguistic structure — cohesion, coherence, discourse markers, genre, and register.</div>
+  </div>
+  <div class="page-body">
+    <div class="tool-grid">
+
+      <!-- COHESION ANALYZER -->
+      <div class="tool-card wide">
+        <div class="tool-title"><div class="t-icon">🔗</div> Cohesion Analyzer (Halliday &amp; Hasan)</div>
+        <textarea id="coh-in" rows="5" placeholder="Paste a paragraph of text…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="cohesionAnalyze()">Analyze Cohesion</button></div>
+        <div class="output" id="coh-out">—</div>
+      </div>
+
+      <!-- DISCOURSE MARKERS -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🚩</div> Discourse Marker Identifier</div>
+        <textarea id="dm-in" rows="4" placeholder="Paste text to find discourse markers (however, therefore, in addition…)…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="discourseMarkers()">Identify</button></div>
+        <div class="output" id="dm-out">—</div>
+      </div>
+
+      <!-- REGISTER ANALYZER -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🎚</div> Register Analyzer</div>
+        <textarea id="reg-in" rows="4" placeholder="Paste a text sample to analyze its register (field, tenor, mode)…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="registerAnalyze()">Analyze Register</button></div>
+        <div class="output" id="reg-out">—</div>
+      </div>
+
+      <!-- TOPIC/COMMENT -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📌</div> Topic–Comment Structure</div>
+        <input type="text" id="tc-in" placeholder="Enter a sentence (e.g. As for John, he left early)…" />
+        <div class="btn-row"><button class="btn btn-primary" onclick="topicComment()">Analyze</button></div>
+        <div class="output" id="tc-out">—</div>
+      </div>
+
+      <!-- TEXT COHERENCE -->
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">✅</div> Coherence Checker</div>
+        <textarea id="coher-in" rows="5" placeholder="Paste a short paragraph to check local coherence…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="coherenceCheck()">Check</button></div>
+        <div class="output" id="coher-out">—</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── CORPUS ─────────── -->
+<section id="page-corpus" class="page">
+  <div class="page-header">
+    <div class="page-eyebrow">Lab 07</div>
+    <div class="page-title">Corpus <span>Lab</span></div>
+    <div class="page-desc">Quantitative text analysis — frequency, concordance (KWIC), n-grams, collocations, readability, and type-token ratio.</div>
+  </div>
+  <div class="page-body">
+
+    <!-- CORPUS INPUT -->
+    <div class="tool-card" style="margin-bottom:24px;border-color:rgba(0,212,255,.3);">
+      <div class="tool-title"><div class="t-icon">📥</div> Corpus Input</div>
+      <textarea id="corpus-main" rows="8" placeholder="Paste your corpus text here. All corpus tools below will use this text…&#10;&#10;(You can also paste into individual tools independently)"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadCorpus()">✓ Load Corpus</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('corpus-main').value='';corpusLoaded=''">Clear</button>
+        <span id="corpus-status" style="font-family:var(--font-mono);font-size:.75rem;color:var(--text3);padding:8px;"></span>
+      </div>
+    </div>
+
+    <div class="tab-row" id="corpus-tabs">
+      <button class="tab-btn active" onclick="switchCorpusTab('freq')">Word Frequency</button>
+      <button class="tab-btn" onclick="switchCorpusTab('kwic')">KWIC / Concordance</button>
+      <button class="tab-btn" onclick="switchCorpusTab('ngram')">N-Grams</button>
+      <button class="tab-btn" onclick="switchCorpusTab('colloc')">Collocations</button>
+      <button class="tab-btn" onclick="switchCorpusTab('ttr')">TTR / Stats</button>
+      <button class="tab-btn" onclick="switchCorpusTab('read')">Readability</button>
+      <button class="tab-btn" onclick="switchCorpusTab('stopword')">Stop Words</button>
+      <button class="tab-btn" onclick="switchCorpusTab('lemma')">Lemma Frequency</button>
+    </div>
+
+    <!-- FREQUENCY -->
+    <div class="tab-pane active" id="tab-freq">
+      <div class="tool-grid-3">
+        <div class="tool-card" style="grid-column:span 3;">
+          <div class="tool-title"><div class="t-icon">📊</div> Word Frequency Counter</div>
+          <textarea id="freq-in" rows="4" placeholder="Or paste text directly here…"></textarea>
+          <div style="display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+            <label class="check-row"><input type="checkbox" id="freq-ci" checked/> Case-insensitive</label>
+            <label class="check-row"><input type="checkbox" id="freq-sw"/> Remove stop words</label>
+            <label style="font-size:.85rem;color:var(--text2);">Top <input type="number" id="freq-top" value="30" min="5" max="200" style="width:60px;display:inline;margin:0 4px;"> words</label>
+          </div>
+          <div class="btn-row"><button class="btn btn-primary" onclick="wordFrequency()">Count</button></div>
+          <div class="output" id="freq-out" style="max-height:400px;overflow-y:auto;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KWIC -->
+    <div class="tab-pane" id="tab-kwic">
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🔍</div> KWIC Concordancer</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input type="text" id="kwic-kw" placeholder="Search keyword…" style="flex:1;" />
+          <input type="number" id="kwic-ctx" value="6" min="2" max="15" style="width:70px;" placeholder="Context" />
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="kwicSearch()">Search</button></div>
+        <div class="output" id="kwic-out" style="max-height:450px;overflow-y:auto;">—</div>
+      </div>
+    </div>
+
+    <!-- NGRAM -->
+    <div class="tab-pane" id="tab-ngram">
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🔡</div> N-Gram Extractor</div>
+        <textarea id="ngram-in" rows="3" placeholder="Or paste text here…"></textarea>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap;">
+          <label style="font-size:.85rem;color:var(--text2);">N = <input type="number" id="ngram-n" value="2" min="1" max="5" style="width:55px;display:inline;margin:0 4px;"></label>
+          <label style="font-size:.85rem;color:var(--text2);">Top <input type="number" id="ngram-top" value="25" min="5" max="100" style="width:60px;display:inline;margin:0 4px;"></label>
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="ngramExtract()">Extract</button></div>
+        <div class="output" id="ngram-out" style="max-height:400px;overflow-y:auto;">—</div>
+      </div>
+    </div>
+
+    <!-- COLLOCATION -->
+    <div class="tab-pane" id="tab-colloc">
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🤝</div> Collocation Finder</div>
+        <input type="text" id="colloc-kw" placeholder="Enter a node word (e.g. strong, make, time)…" />
+        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+          <label style="font-size:.85rem;color:var(--text2);">Window size: <input type="number" id="colloc-win" value="3" min="1" max="10" style="width:55px;display:inline;margin:0 4px;"></label>
+          <label style="font-size:.85rem;color:var(--text2);">Min freq: <input type="number" id="colloc-min" value="2" min="1" max="10" style="width:55px;display:inline;margin:0 4px;"></label>
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="collocFinder()">Find Collocates</button></div>
+        <div class="output" id="colloc-out" style="max-height:350px;overflow-y:auto;">—</div>
+      </div>
+    </div>
+
+    <!-- TTR -->
+    <div class="tab-pane" id="tab-ttr">
+      <div class="tool-card wide">
+        <div class="tool-title"><div class="t-icon">📐</div> Type-Token Ratio &amp; Text Statistics</div>
+        <textarea id="ttr-in" rows="4" placeholder="Or paste text here…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="calcTTR()">Calculate</button></div>
+        <div class="output" id="ttr-out">—</div>
+      </div>
+    </div>
+
+    <!-- READABILITY -->
+    <div class="tab-pane" id="tab-read">
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">📖</div> Readability Metrics</div>
+        <textarea id="read-in" rows="5" placeholder="Or paste text here…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="readabilityCalc()">Calculate</button></div>
+        <div class="output" id="read-out">—</div>
+      </div>
+    </div>
+
+    <!-- STOP WORDS -->
+    <div class="tab-pane" id="tab-stopword">
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🚫</div> Stop Word Remover</div>
+        <textarea id="sw-in" rows="4" placeholder="Or paste text here…"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="removeStopWords()">Remove Stop Words</button>
+          <button class="btn btn-ghost" onclick="showStopWords()">View Stop Word List</button>
+        </div>
+        <div class="output" id="sw-out">—</div>
+      </div>
+    </div>
+
+    <!-- LEMMA -->
+    <div class="tab-pane" id="tab-lemma">
+      <div class="tool-card">
+        <div class="tool-title"><div class="t-icon">🌱</div> Lemma Frequency Counter</div>
+        <textarea id="lemma-in" rows="4" placeholder="Or paste text here…"></textarea>
+        <div class="btn-row"><button class="btn btn-primary" onclick="lemmaFreq()">Count Lemmas</button></div>
+        <div class="output" id="lemma-out" style="max-height:400px;overflow-y:auto;">—</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+</div><!-- #app -->
+
+<script>
+/* ══════════════════════════════════════════════
+   BACKGROUND — ANIMATED GRID + PARTICLES
+══════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles=[], t=0;
+
+  function resize(){
+    w=canvas.width=window.innerWidth;
+    h=canvas.height=window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  // Create particles
+  for(let i=0;i<55;i++){
+    particles.push({
+      x:Math.random()*2000, y:Math.random()*2000,
+      vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+      r:Math.random()*1.2+.3,
+      a:Math.random()
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    t+=.003;
+
+    // Grid
+    ctx.strokeStyle='rgba(0,180,255,0.04)';
+    ctx.lineWidth=1;
+    const gs=60;
+    for(let x=0;x<w;x+=gs){
+      ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();
+    }
+    for(let y=0;y<h;y+=gs){
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
+    }
+
+    // Floating glow orbs
+    const orbs=[
+      {x:w*.15,y:h*.25,r:200,c:'rgba(0,180,255,0.04)'},
+      {x:w*.75,y:h*.6,r:280,c:'rgba(123,47,255,0.04)'},
+      {x:w*.5,y:h*.8,r:150,c:'rgba(0,255,157,0.03)'},
+    ];
+    orbs.forEach(o=>{
+      const grd=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+      grd.addColorStop(0,o.c);grd.addColorStop(1,'transparent');
+      ctx.fillStyle=grd;
+      ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.fill();
+    });
+
+    // Particles
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>w) p.vx*=-1;
+      if(p.y<0||p.y>h) p.vy*=-1;
+      ctx.beginPath();
+      ctx.arc(p.x%w, p.y%h, p.r, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(0,200,255,${p.a*0.5})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ══════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════ */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const items=document.querySelectorAll('.nav-item');
+  items.forEach(item=>{
+    if(item.getAttribute('onclick')&&item.getAttribute('onclick').includes("'"+id+"'")){
+      item.classList.add('active');
+    }
+  });
+  window.scrollTo(0,0);
+  if(window.innerWidth<900) document.getElementById('sidebar').classList.remove('open');
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+/* ══════════════════════════════════════════════
+   CORPUS TABS
+══════════════════════════════════════════════ */
+function switchCorpusTab(id){
+  document.querySelectorAll('#corpus-tabs .tab-btn').forEach((b,i)=>{
+    b.classList.remove('active');
+    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+  });
+  document.querySelectorAll('[id^=tab-]').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+let corpusLoaded='';
+function loadCorpus(){
+  corpusLoaded=document.getElementById('corpus-main').value.trim();
+  const words=corpusLoaded.split(/\s+/).filter(Boolean);
+  document.getElementById('corpus-status').textContent=
+    corpusLoaded ? `✓ Loaded: ${words.length} words, ${corpusLoaded.length} chars` : '';
+}
+function getCorpusText(fieldId){
+  const local=document.getElementById(fieldId)?.value.trim();
+  if(local) return local;
+  return corpusLoaded;
+}
+function copyText(id){
+  const el=document.getElementById(id);
+  navigator.clipboard.writeText(el.value||el.textContent).then(()=>alert('Copied!'));
+}
+function ipa(ch){
+  const el=document.getElementById('ipa-out');
+  el.value+=ch;
+  el.focus();
+}
+function out(id,html){document.getElementById(id).innerHTML=html;}
+function tag(text,cls){return`<span class="tag tag-${cls}">${text}</span>`;}
+function h(t,cls='highlight'){return`<span class="${cls}">${t}</span>`;}
+
+/* ══════════════════════════════════════════════
+   PHONETICS TOOLS
+══════════════════════════════════════════════ */
+const VOWELS = new Set(['a','e','i','o','u','y']);
+
+function isVowel(ch){return VOWELS.has(ch.toLowerCase());}
+
+function analyzeCVPattern(){
+  const w=document.getElementById('cv-in').value.trim().toLowerCase().replace(/[^a-z]/g,'');
+  if(!w){out('cv-out','Please enter a word.');return;}
+  let pattern='', segs=[];
+  for(const ch of w){
+    const t=isVowel(ch)?'V':'C';
+    pattern+=t;
+    segs.push({ch,t});
+  }
+  const segHtml=segs.map(s=>`${h(s.ch,'highlight')}(${h(s.t,s.t==='V'?'hl-a':'hl-v')})`).join(' ');
+  const onset=w.match(/^[^aeiou]+/)?.[0]||'∅';
+  const coda=w.match(/[^aeiou]+$/)?.[0]||'∅';
+  const nucleus=w.match(/[aeiou]+/)?.[0]||'∅';
+  const clusters=w.match(/[^aeiou]{2,}/g)||[];
+  out('cv-out',
+    `${h('Word:')} ${w}\n${h('CV Pattern:')} ${pattern}\n${h('Segments:')} ${segHtml}\n\n`+
+    `${h('Onset:')} ${onset}   ${h('Nucleus:')} ${nucleus}   ${h('Coda:')} ${coda}\n`+
+    `${h('Consonant Clusters:')} ${clusters.length?clusters.join(', '):'none'}\n`+
+    `${h('Vowels:')} ${w.split('').filter(isVowel).join(', ')}\n`+
+    `${h('Consonants:')} ${w.split('').filter(c=>!isVowel(c)).join(', ')}`
+  );
+}
+
+function countSyllables(){
+  const w=document.getElementById('syl-in').value.trim();
+  if(!w){out('syl-out','Please enter a word.');return;}
+  const words=w.split(/\s+/);
+  let result='';
+  words.forEach(word=>{
+    const clean=word.toLowerCase().replace(/[^a-z]/g,'');
+    let count=clean.match(/[aeiou]+/g)?.length||1;
+    if(clean.endsWith('e')&&count>1) count--;
+    if(clean.endsWith('le')&&clean.length>3) count++;
+    count=Math.max(1,count);
+    result+=`${h(word)} → ${h(count,'hl-a')} syllable${count!==1?'s':''}\n`;
+  });
+  out('syl-out',result.trim());
+}
+
+const MINI_PAIRS_DB={
+  'cat':['bat','hat','mat','rat','sat','vat','fat','pat'],
+  'bit':['bat','bot','but','bet','bit','pit','sit','hit','fit','kit','wit'],
+  'pat':['bat','cat','fat','hat','mat','rat','sat','vat'],
+  'pin':['bin','fin','kin','sin','tin','win','min','din'],
+  'bat':['cat','hat','mat','rat','sat','fat','pat','bit','but','bot'],
+  'big':['bag','bug','bog','beg','bid','bill','bit'],
+  'mop':['hop','top','pop','cop','lop','sop','mob','mod','mom'],
+  'run':['bun','fun','gun','nun','pun','sun','ton','hun'],
+  'rice':['ice','nice','mice','price','dice','lice','vice','twice'],
+  'light':['fight','might','night','right','sight','tight','kite','bite'],
+};
+function findMinimalPairs(){
+  const w=document.getElementById('mp-in').value.trim().toLowerCase();
+  if(!w){out('mp-out','Please enter a word.');return;}
+  let pairs=MINI_PAIRS_DB[w];
+  if(!pairs){
+    // Generate by swapping single letters
+    pairs=[];
+    const alpha='abcdefghijklmnopqrstuvwxyz';
+    const commonWords=new Set(['the','a','an','is','it','in','on','at','to','be','do','go','no','up','us','we','he','she','me','my','by','or','as','so','if','of','am','are','was','were','has','had','can','all','too','one','two','for','but','not','you','who','how','now','own','way','may','any','say','her','she','his','him','man','men','car','dog','cat','bat','hat','mat','rat','sat','fat','bit','sit','hit','fit','big','bag','bug','bog','beg','run','bun','fun','gun','sun','hop','top','pop','cop','ice','nice','mice','rice']);
+    for(let i=0;i<w.length;i++){
+      for(const c of alpha){
+        if(c!==w[i]){
+          const candidate=w.slice(0,i)+c+w.slice(i+1);
+          if(commonWords.has(candidate)) pairs.push(candidate);
+        }
+      }
+    }
+    if(!pairs.length) pairs=['(No common minimal pairs found in database)'];
+  }
+  const pairsHtml=pairs.map(p=>`${tag(p,'cyan')}`).join(' ');
+  out('mp-out',`${h('Target:')} ${w}\n${h('Minimal pairs:')} ${pairsHtml}\n\nMinimal pairs differ in exactly one phoneme, showing phonemic contrast.`);
+}
+
+function countPhonemes(){
+  const w=document.getElementById('phon-in').value.trim();
+  if(!w){out('phon-out','Enter a word.');return;}
+  const graphemes=w.replace(/\s/g,'').length;
+  const clean=w.toLowerCase().replace(/[^a-z]/g,'');
+  // Simple approximation
+  let phonemes=clean.length;
+  // Silent e
+  if(clean.endsWith('e')&&clean.length>2) phonemes--;
+  // gh combinations
+  phonemes-=(clean.match(/gh/g)||[]).length;
+  // ck → one sound
+  phonemes-=(clean.match(/ck/g)||[]).length;
+  // th → one sound
+  phonemes-=(clean.match(/th/g)||[]).length;
+  // sh → one sound
+  phonemes-=(clean.match(/sh/g)||[]).length;
+  // ch → one sound
+  phonemes-=(clean.match(/ch/g)||[]).length;
+  // double letters
+  for(let i=0;i<clean.length-1;i++) if(clean[i]===clean[i+1]) phonemes--;
+  phonemes=Math.max(1,phonemes);
+  out('phon-out',
+    `${h('Word:')} ${w}\n${h('Graphemes (letters):')} ${graphemes}\n`+
+    `${h('Estimated Phonemes:')} ${phonemes}\n`+
+    `${h('Ratio:')} ${(graphemes/phonemes).toFixed(2)} letters per phoneme\n\n`+
+    `${h('Note:')} English has ~40 phonemes but 26 letters — a non-transparent orthography.`
+  );
+}
+
+const FEAT_DB={
+  p:{vocalic:'-',consonantal:'+',voiced:'-',nasal:'-',continuant:'-',bilabial:'+',coronal:'-',dorsal:'-'},
+  b:{vocalic:'-',consonantal:'+',voiced:'+',nasal:'-',continuant:'-',bilabial:'+',coronal:'-',dorsal:'-'},
+  t:{vocalic:'-',consonantal:'+',voiced:'-',nasal:'-',continuant:'-',bilabial:'-',coronal:'+',dorsal:'-'},
+  d:{vocalic:'-',consonantal:'+',voiced:'+',nasal:'-',continuant:'-',bilabial:'-',coronal:'+',dorsal:'-'},
+  k:{vocalic:'-',consonantal:'+',voiced:'-',nasal:'-',continuant:'-',bilabial:'-',coronal:'-',dorsal:'+'},
+  g:{vocalic:'-',consonantal:'+',voiced:'+',nasal:'-',continuant:'-',bilabial:'-',coronal:'-',dorsal:'+'},
+  m:{vocalic:'-',consonantal:'+',voiced:'+',nasal:'+',continuant:'-',bilabial:'+',coronal:'-',dorsal:'-'},
+  n:{vocalic:'-',consonantal:'+',voiced:'+',nasal:'+',continuant:'-',bilabial:'-',coronal:'+',dorsal:'-'},
+  s:{vocalic:'-',consonantal:'+',voiced:'-',nasal:'-',continuant:'+',bilabial:'-',coronal:'+',dorsal:'-'},
+  z:{vocalic:'-',consonantal:'+',voiced:'+',nasal:'-',continuant:'+',bilabial:'-',coronal:'+',dorsal:'-'},
+  f:{vocalic:'-',consonantal:'+',voiced:'-',nasal:'-',continuant:'+',bilabial:'+',coronal:'-',dorsal:'-'},
+  v:{vocalic:'-',consonantal:'+',voiced:'+',nasal:'-',continuant:'+',bilabial:'+',coronal:'-',dorsal:'-'},
+};
+function distinctiveFeatures(){
+  const input=document.getElementById('df-in').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const feats=['vocalic','consonantal','voiced','nasal','continuant','bilabial','coronal','dorsal'];
+  const valid=input.filter(c=>FEAT_DB[c]);
+  if(!valid.length){out('df-out','Enter known consonants: p b t d k g m n s z f v');return;}
+  let html=`<table class="matrix-tbl"><tr><th>Feature</th>${valid.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  feats.forEach(f=>{
+    html+=`<tr><td style="color:var(--text2);text-align:left;">[${f}]</td>`;
+    valid.forEach(c=>{
+      const v=FEAT_DB[c][f];
+      html+=`<td class="${v==='+'?'plus':'minus'}">${v}</td>`;
+    });
+    html+='</tr>';
+  });
+  html+='</table>';
+  out('df-out',html);
+}
+
+const STRESS_DB={
+  'photography':'pho-TO-gra-phy',
+  'understanding':'un-der-STAND-ing',
+  'international':'in-ter-NA-tion-al',
+  'linguistics':'lin-GUIS-tics',
+  'phonology':'pho-NOL-o-gy',
+  'morphology':'mor-PHOL-o-gy',
+  'semantics':'se-MAN-tics',
+  'pragmatics':'prag-MAT-ics',
+  'education':'ed-u-CA-tion',
+  'communication':'com-mu-ni-CA-tion',
+  'university':'u-ni-VER-si-ty',
+  'economy':'e-CON-o-my',
+  'democracy':'de-MOC-ra-cy',
+  'electricity':'e-lec-TRIC-i-ty',
+};
+function stressPattern(){
+  const w=document.getElementById('stress-in').value.trim().toLowerCase();
+  if(STRESS_DB[w]){
+    const parts=STRESS_DB[w].split('-');
+    const html=parts.map(p=>{
+      if(p===p.toUpperCase()&&p.length>1) return h('['+p.toLowerCase()+']','hl-a');
+      return `<span style="color:var(--text2)">${p}</span>`;
+    }).join(' - ');
+    out('stress-out',`${h('Word:')} ${w}\n${h('Stress pattern:')} ${STRESS_DB[w]}\n${h('Marked:')} ${html}\n\n[UPPERCASE] = primary stress`);
+  } else {
+    // Simple heuristic: stress penultimate syllable for 3+ syllable words
+    const clean=w.replace(/[^a-z]/g,'');
+    const sylMatches=clean.match(/[^aeiou]*[aeiou]+[^aeiou]*/g)||[clean];
+    const syllables=sylMatches.filter(s=>s.length>0);
+    let stressIdx=syllables.length>2?syllables.length-2:0;
+    const result=syllables.map((s,i)=>i===stressIdx?`[${s.toUpperCase()}]`:s).join('-');
+    out('stress-out',
+      `${h('Word:')} ${w}\n`+
+      `${h('Syllables (~):')} ${syllables.join('-')} (${syllables.length})\n`+
+      `${h('Estimated Stress:')} ${result}\n\n`+
+      `Note: Stress assignment uses a penultimate heuristic. Actual stress may differ.`
+    );
+  }
+}
+
+function clusterDetect(){
+  const w=document.getElementById('cc-in').value.trim().toLowerCase().replace(/[^a-z]/g,'');
+  if(!w){out('cc-out','Enter a word.');return;}
+  const initClusters=w.match(/^[^aeiou]+/)?.[0]||'∅';
+  const finalClusters=w.match(/[^aeiou]+$/)?.[0]||'∅';
+  const allClusters=w.match(/[^aeiou]{2,}/g)||[];
+  const maxCluster=allClusters.sort((a,b)=>b.length-a.length)[0]||'none';
+  out('cc-out',
+    `${h('Word:')} ${w}\n`+
+    `${h('Initial cluster:')} ${initClusters}\n`+
+    `${h('Final cluster:')} ${finalClusters}\n`+
+    `${h('All clusters:')} ${allClusters.length?allClusters.join(', '):'none'}\n`+
+    `${h('Longest cluster:')} ${maxCluster} (${maxCluster.length} C)\n\n`+
+    `${h('Sonority scale:')} vowels > glides > liquids > nasals > fricatives > stops\n`+
+    `Sonority Sequencing Principle: clusters rise to nucleus, fall to coda.`
+  );
+}
+
+/* ══════════════════════════════════════════════
+   MORPHOLOGY TOOLS
+══════════════════════════════════════════════ */
+const PREFIXES=['un','re','dis','mis','pre','pro','anti','non','de','over','under','out','semi','sub','super','trans','inter','intra','counter','ex','co','bi','tri','multi','mega','micro','macro','neo','pseudo','auto','self'];
+const SUFFIXES=['ing','ed','er','est','ly','ness','ment','tion','sion','ity','ive','ous','al','ful','less','ish','able','ible','ance','ence','ism','ist','ize','ise','ify','ify','ation','ship','hood','dom','ward','wards','wise'];
+
+function segmentMorphemes(){
+  const w=document.getElementById('morph-in').value.trim().toLowerCase();
+  if(!w){out('morph-out','Enter a word.');return;}
+  let remaining=w, found=[], morphemes=[];
+  // Find prefix
+  let prefix='';
+  for(const p of PREFIXES.sort((a,b)=>b.length-a.length)){
+    if(remaining.startsWith(p)&&remaining.length>p.length){
+      prefix=p; remaining=remaining.slice(p.length); break;
+    }
+  }
+  if(prefix) found.push({m:prefix,type:'PREFIX'});
+  // Find suffix
+  let suffix='';
+  let suffixRemaining=remaining;
+  for(const s of SUFFIXES.sort((a,b)=>b.length-a.length)){
+    if(suffixRemaining.endsWith(s)&&suffixRemaining.length>s.length){
+      suffix=s; suffixRemaining=suffixRemaining.slice(0,-s.length); break;
+    }
+  }
+  if(suffix){
+    found.push({m:suffixRemaining,type:'ROOT'});
+    found.push({m:suffix,type:'SUFFIX'});
+  } else {
+    found.push({m:suffixRemaining,type:'ROOT'});
+  }
+  const html=found.map(f=>{
+    const cls=f.type==='PREFIX'?'cyan':f.type==='SUFFIX'?'violet':'green';
+    return `${tag(f.m,cls)} ${h('['+f.type+']','hl-'+cls.replace('cyan','').replace('violet','v').replace('green','g'))}\n`;
+  }).join('');
+  out('morph-out',
+    `${h('Word:')} ${w}\n${h('Morpheme Analysis:')}\n${html}\n`+
+    `${h('Count:')} ${found.length} morpheme(s)\n`+
+    `${h('Type:')} ${prefix&&suffix?'prefixed+suffixed':prefix?'prefixed':suffix?'suffixed':'simplex'}`
+  );
+}
+
+function identifyAffixes(){
+  const w=document.getElementById('affix-in').value.trim().toLowerCase();
+  if(!w){out('affix-out','Enter a word.');return;}
+  let res=`${h('Word:')} ${w}\n\n`;
+  let found=false;
+  for(const p of PREFIXES.sort((a,b)=>b.length-a.length)){
+    if(w.startsWith(p)&&w.length>p.length){
+      res+=`${h('PREFIX:')} ${tag(p,'cyan')} — ${prefixMeaning(p)}\n`;
+      found=true; break;
+    }
+  }
+  for(const s of SUFFIXES.sort((a,b)=>b.length-a.length)){
+    if(w.endsWith(s)&&w.length>s.length){
+      res+=`${h('SUFFIX:')} ${tag(s,'violet')} — ${suffixMeaning(s)}\n`;
+      found=true; break;
+    }
+  }
+  if(!found) res+=`${h('No common affixes detected.')} This may be a base/root word or use affixes not in database.\n`;
+  out('affix-out',res);
+}
+
+function prefixMeaning(p){
+  const m={un:'negation/reversal',re:'again',dis:'not/apart',mis:'wrongly',pre:'before',pro:'in favor of',anti:'against',non:'not',de:'reversal/removal',over:'excess',under:'insufficient',out:'surpassing',semi:'half',sub:'under',super:'above',trans:'across',inter:'between',intra:'within',counter:'against',ex:'former/out of',co:'together',bi:'two',tri:'three',multi:'many'};
+  return m[p]||'lexical modification';
+}
+function suffixMeaning(s){
+  const m={ing:'present participle / gerund',ed:'past tense / past participle',er:'comparative / agent noun',est:'superlative',ly:'adverb-forming',ness:'noun: state/quality',ment:'noun: result/process',tion:'noun: action/state',sion:'noun: action/state',ity:'noun: quality',ive:'adjective-forming',ous:'adjective: having quality',al:'adjective-forming',ful:'adjective: having',less:'adjective: without',ish:'somewhat/like',able:'adjective: capable of',ible:'adjective: capable of',ance:'noun: state',ence:'noun: state',ism:'doctrine/practice',ist:'agent/adherent',ize:'verb-forming',ship:'noun: condition/status',hood:'noun: state/period',dom:'noun: state/realm',ward:'direction'};
+  return m[s]||'grammatical or derivational';
+}
+
+function classifyWordFormation(){
+  const w=document.getElementById('wf-in').value.trim().toLowerCase();
+  if(!w){out('wf-out','Enter a word or phrase.');return;}
+  const blends={brunch:'breakfast + lunch',smog:'smoke + fog',motel:'motor + hotel',blog:'web + log',pixel:'picture + element',podcast:'iPod + broadcast',electrocute:'electric + execute',Wikipedia:'wiki + encyclopedia',internet:'interconnected + network',email:'electronic + mail',sitcom:'situation + comedy',romcom:'romantic + comedy',brexit:'Britain + exit',jeggings:'jeans + leggings',skort:'skirt + shorts',spork:'spoon + fork',chillax:'chill + relax',guestimate:'guess + estimate',staycation:'stay + vacation',infomercial:'information + commercial'};
+  const acronyms={NASA:'National Aeronautics and Space Administration',NATO:'North Atlantic Treaty Organization',LASER:'Light Amplification by Stimulated Emission of Radiation',RADAR:'Radio Detection And Ranging',AIDS:'Acquired Immune Deficiency Syndrome',SCUBA:'Self-Contained Underwater Breathing Apparatus',STEM:'Science Technology Engineering Mathematics',PIN:'Personal Identification Number',FAQ:'Frequently Asked Questions',LOL:'Laugh Out Loud'};
+  const clippings={ad:'advertisement',bike:'bicycle',bus:'omnibus',doc:'doctor',exam:'examination',fax:'facsimile',gym:'gymnasium',lab:'laboratory',math:'mathematics',phone:'telephone',plane:'airplane',prof:'professor',pub:'public house',specs:'spectacles',vet:'veterinarian'};
+  let result='';
+  if(blends[w]) result=`${tag('BLEND','amber')}\n${h('Formation:')} ${w} = ${blends[w]}\nTwo words merged into one new word.`;
+  else if(acronyms[w.toUpperCase()]) result=`${tag('ACRONYM','cyan')}\n${h('Stands for:')} ${acronyms[w.toUpperCase()]}\nInitial letters of a phrase.`;
+  else if(clippings[w]) result=`${tag('CLIPPING','violet')}\n${h('Clipped from:')} ${clippings[w]}\nShortened version of a longer word.`;
+  else if(w.includes(' ')){
+    result=`${tag('COMPOUND','green')}\n${h('Components:')} [${w.split(' ').join('] + [')}]\nCompound word formed from multiple free morphemes.`;
+  } else if(PREFIXES.some(p=>w.startsWith(p))&&SUFFIXES.some(s=>w.endsWith(s))){
+    result=`${tag('DERIVATION','cyan')}\nPrefix + Root + Suffix structure.\nDerivational morphology: changes word class or meaning.`;
+  } else if(PREFIXES.some(p=>w.startsWith(p))){
+    result=`${tag('PREFIXATION','cyan')}\nFormed by adding a prefix to a base word.\nDerivational process.`;
+  } else if(SUFFIXES.some(s=>w.endsWith(s))){
+    result=`${tag('SUFFIXATION','violet')}\nFormed by adding a suffix to a base word.\nMay be derivational or inflectional.`;
+  } else if(/(.)\1{1,}/.test(w)){
+    result=`${tag('REDUPLICATION','pink')}\nPartial or full reduplication detected.`;
+  } else {
+    result=`${tag('SIMPLE/BASE WORD','green')}\nAppears to be a root/base morpheme or borrowed word.\nPossible: conversion (zero-derivation), borrowing, or coinage.`;
+  }
+  out('wf-out',result);
+}
+
+function generateParadigm(){
+  const base=document.getElementById('para-in').value.trim().toLowerCase();
+  const type=document.getElementById('para-type').value;
+  if(!base){out('para-out','Enter a base word.');return;}
+  let rows=[];
+  if(type==='verb'){
+    const s=base.endsWith('e')?base+'s':base.endsWith('y')&&!'aeiou'.includes(base.slice(-2,-1))?base.slice(0,-1)+'ies':base+'s';
+    const ed=base.endsWith('e')?base+'d':base.endsWith('y')&&!'aeiou'.includes(base.slice(-2,-1))?base.slice(0,-1)+'ied':base+'ed';
+    const ing=base.endsWith('e')&&base.length>2?base.slice(0,-1)+'ing':base+'ing';
+    rows=[
+      ['Infinitive','to '+base],
+      ['Present (1sg/2sg/1pl/2pl/3pl)','I/you/we/they '+base],
+      ['Present (3sg)','he/she/it '+s],
+      ['Past tense',''+ed],
+      ['Past participle','(have) '+ed],
+      ['Present participle',ing],
+    ];
+  } else if(type==='noun'){
+    const pl=base.endsWith('s')||base.endsWith('x')||base.endsWith('z')||base.endsWith('ch')||base.endsWith('sh')?base+'es':base.endsWith('y')&&!'aeiou'.includes(base.slice(-2,-1))?base.slice(0,-1)+'ies':base+'s';
+    rows=[
+      ['Singular (base)','a/the '+base],
+      ['Plural',pl],
+      ['Possessive (sg)',base+"'s"],
+      ['Possessive (pl)',pl.endsWith("'s")?pl:pl+"'"],
+    ];
+  } else {
+    const er=base.endsWith('e')?base+'r':base+'er';
+    const est=base.endsWith('e')?base+'st':base+'est';
+    rows=[
+      ['Positive',base],
+      ['Comparative (short)',er],
+      ['Superlative (short)',est],
+      ['Comparative (long)','more '+base],
+      ['Superlative (long)','most '+base],
+      ['Adverb',base+'ly'],
+    ];
+  }
+  let html=`<table class="tbl"><tr><th>Form</th><th>Realization</th></tr>`;
+  rows.forEach(r=>html+=`<tr><td>${r[0]}</td><td style="color:var(--cyan)">${r[1]}</td></tr>`);
+  html+='</table>';
+  out('para-out',html);
+}
+
+function morphTree(){
+  const w=document.getElementById('mtree-in').value.trim().toLowerCase();
+  if(!w){out('mtree-out','Enter a word.');return;}
+  // Build a simplified hierarchical tree
+  let prefix='',root=w,suffix='';
+  for(const p of PREFIXES.sort((a,b)=>b.length-a.length)){
+    if(w.startsWith(p)&&w.length>p.length){prefix=p;root=root.slice(p.length);break;}
+  }
+  for(const s of SUFFIXES.sort((a,b)=>b.length-a.length)){
+    if(root.endsWith(s)&&root.length>s.length){suffix=s;root=root.slice(0,-s.length);break;}
+  }
+  let html='<div style="padding:10px;font-family:var(--font-mono);font-size:.82rem;">';
+  html+=`<div style="display:flex;flex-direction:column;align-items:center;gap:0;">`;
+  // Word level
+  html+=`<div style="padding:6px 14px;border-radius:6px;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.25);color:var(--cyan);font-weight:700;">${w}</div>`;
+  html+=`<div style="width:1px;height:20px;background:var(--text3);"></div>`;
+  // Components
+  const parts=[];
+  if(prefix) parts.push({label:prefix,type:'PREFIX',color:'var(--cyan)'});
+  parts.push({label:root,type:'ROOT',color:'var(--green)'});
+  if(suffix) parts.push({label:suffix,type:'SUFFIX',color:'var(--violet2)'});
+  html+=`<div style="display:flex;gap:20px;align-items:flex-start;position:relative;">`;
+  if(parts.length>1){
+    html+=`<div style="position:absolute;top:0;left:0;right:0;height:1px;background:var(--text3);"></div>`;
+  }
+  parts.forEach(p=>{
+    html+=`<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding-top:${parts.length>1?'0':'0'}px;">`;
+    html+=`<div style="width:1px;height:16px;background:var(--text3);"></div>`;
+    html+=`<div style="padding:4px 10px;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid ${p.color}44;color:${p.color};text-align:center;">`;
+    html+=`<div style="font-size:.65rem;color:${p.color}88;margin-bottom:2px;">${p.type}</div>`;
+    html+=`<div>${p.label}</div></div></div>`;
+  });
+  html+=`</div></div></div>`;
+  out('mtree-out',html);
+}
+
+function morphDensity(){
+  const t=document.getElementById('mdens-in').value.trim();
+  if(!t){out('mdens-out','Enter text.');return;}
+  const words=t.split(/\s+/).filter(Boolean);
+  let totalMorphemes=0;
+  words.forEach(w=>{
+    const clean=w.toLowerCase().replace(/[^a-z]/g,'');
+    let m=1;
+    for(const p of PREFIXES) if(clean.startsWith(p)) {m++;break;}
+    for(const s of SUFFIXES) if(clean.endsWith(s)&&clean.length>s.length) {m++;break;}
+    totalMorphemes+=m;
+  });
+  const density=(totalMorphemes/words.length).toFixed(2);
+  out('mdens-out',
+    `${h('Words:')} ${words.length}\n`+
+    `${h('Estimated Morphemes:')} ${totalMorphemes}\n`+
+    `${h('Morpheme Density (M/W):')} ${density}\n\n`+
+    `Morpheme density > 1.5 suggests derivational complexity.\nSample sentence average: ~1.2–1.8 morphemes/word.`
+  );
+}
+
+/* ══════════════════════════════════════════════
+   SYNTAX TOOLS
+══════════════════════════════════════════════ */
+const POS_MAP={
+  // Determiners
+  the:'DET',a:'DET',an:'DET',this:'DET',that:'DET',these:'DET',those:'DET',my:'DET',your:'DET',his:'DET',her:'DET',its:'DET',our:'DET',their:'DET',some:'DET',any:'DET',no:'DET',every:'DET',each:'DET',
+  // Pronouns
+  i:'PRON',you:'PRON',he:'PRON',she:'PRON',it:'PRON',we:'PRON',they:'PRON',me:'PRON',him:'PRON',them:'PRON',us:'PRON',who:'PRON',what:'PRON',which:'PRON',
+  // Aux
+  is:'AUX',are:'AUX',was:'AUX',were:'AUX',be:'AUX',been:'AUX',being:'AUX',have:'AUX',has:'AUX',had:'AUX',do:'AUX',does:'AUX',did:'AUX',will:'MODAL',would:'MODAL',can:'MODAL',could:'MODAL',shall:'MODAL',should:'MODAL',may:'MODAL',might:'MODAL',must:'MODAL',
+  // Prepositions
+  in:'PREP',on:'PREP',at:'PREP',to:'PREP',of:'PREP',for:'PREP',by:'PREP',with:'PREP',from:'PREP',about:'PREP',over:'PREP',under:'PREP',between:'PREP',through:'PREP',into:'PREP',onto:'PREP',upon:'PREP',
+  // Conjunctions
+  and:'CONJ',but:'CONJ',or:'CONJ',nor:'CONJ',so:'CONJ',yet:'CONJ',for:'CONJ',because:'SCONJ',although:'SCONJ',though:'SCONJ',if:'SCONJ',when:'SCONJ',while:'SCONJ',that:'SCONJ',
+  // Common adjectives
+  big:'ADJ',small:'ADJ',large:'ADJ',little:'ADJ',good:'ADJ',bad:'ADJ',great:'ADJ',new:'ADJ',old:'ADJ',high:'ADJ',low:'ADJ',hot:'ADJ',cold:'ADJ',quick:'ADJ',slow:'ADJ',fast:'ADJ',hard:'ADJ',soft:'ADJ',long:'ADJ',short:'ADJ',early:'ADJ',late:'ADJ',happy:'ADJ',sad:'ADJ',young:'ADJ',beautiful:'ADJ',brown:'ADJ',red:'ADJ',blue:'ADJ',green:'ADJ',black:'ADJ',white:'ADJ',lazy:'ADJ',
+  // Common adverbs
+  very:'ADV',quite:'ADV',rather:'ADV',too:'ADV',also:'ADV',just:'ADV',only:'ADV',never:'ADV',always:'ADV',often:'ADV',sometimes:'ADV',here:'ADV',there:'ADV',now:'ADV',then:'ADV',still:'ADV',already:'ADV',not:'NEG',"n't":'NEG',
+  // Common verbs
+  go:'VERB',went:'VERB',gone:'VERB',come:'VERB',came:'VERB',get:'VERB',got:'VERB',give:'VERB',gave:'VERB',given:'VERB',take:'VERB',took:'VERB',taken:'VERB',make:'VERB',made:'VERB',see:'VERB',saw:'VERB',seen:'VERB',know:'VERB',knew:'VERB',known:'VERB',think:'VERB',thought:'VERB',say:'VERB',said:'VERB',tell:'VERB',told:'VERB',put:'VERB',set:'VERB',sit:'VERB',sat:'VERB',run:'VERB',ran:'VERB',walk:'VERB',walked:'VERB',want:'VERB',like:'VERB',need:'VERB',feel:'VERB',felt:'VERB',look:'VERB',use:'VERB',find:'VERB',found:'VERB',keep:'VERB',kept:'VERB',let:'VERB',begin:'VERB',began:'VERB',show:'VERB',hear:'VERB',heard:'VERB',play:'VERB',move:'VERB',live:'VERB',hold:'VERB',speak:'VERB',read:'VERB',write:'VERB',eat:'VERB',ate:'VERB',ate:'VERB',drink:'VERB',drank:'VERB',sleep:'VERB',slept:'VERB',love:'VERB',help:'VERB',open:'VERB',close:'VERB',send:'VERB',sent:'VERB',buy:'VERB',bought:'VERB',sell:'VERB',sold:'VERB',stop:'VERB',start:'VERB',turn:'VERB',lead:'VERB',stand:'VERB',lost:'VERB',lose:'VERB',win:'VERB',won:'VERB',leave:'VERB',left:'VERB',pass:'VERB',hit:'VERB',cut:'VERB',try:'VERB',tried:'VERB',ask:'VERB',answer:'VERB',call:'VERB',jump:'VERB',fly:'VERB',fall:'VERB',fell:'VERB',drop:'VERB',bring:'VERB',brought:'VERB',catch:'VERB',caught:'VERB',push:'VERB',pull:'VERB',break:'VERB',broke:'VERB',build:'VERB',built:'VERB',meet:'VERB',met:'VERB',enjoy:'VERB',follow:'VERB',happen:'VERB',
+  // Common nouns (heuristic - if ends in common noun suffix or is known)
+  cat:'NOUN',dog:'NOUN',man:'NOUN',woman:'NOUN',child:'NOUN',boy:'NOUN',girl:'NOUN',house:'NOUN',car:'NOUN',book:'NOUN',school:'NOUN',world:'NOUN',life:'NOUN',day:'NOUN',time:'NOUN',year:'NOUN',way:'NOUN',part:'NOUN',place:'NOUN',case:'NOUN',week:'NOUN',company:'NOUN',system:'NOUN',program:'NOUN',question:'NOUN',hand:'NOUN',number:'NOUN',night:'NOUN',point:'NOUN',home:'NOUN',water:'NOUN',room:'NOUN',mother:'NOUN',area:'NOUN',money:'NOUN',story:'NOUN',fact:'NOUN',month:'NOUN',lot:'NOUN',right:'NOUN',study:'NOUN',book:'NOUN',eye:'NOUN',job:'NOUN',word:'NOUN',business:'NOUN',issue:'NOUN',side:'NOUN',kind:'NOUN',head:'NOUN',house:'NOUN',service:'NOUN',friend:'NOUN',father:'NOUN',power:'NOUN',hour:'NOUN',game:'NOUN',line:'NOUN',end:'NOUN',among:'PREP',fox:'NOUN',mat:'NOUN',sat:'VERB',jumped:'VERB',jumps:'VERB',lazy:'ADJ',over:'PREP',
+};
+const POS_COLORS={DET:'hl-v',PRON:'hl-p',AUX:'hl-a',MODAL:'hl-a',VERB:'hl-g',NOUN:'highlight',ADJ:'hl-a',ADV:'hl-v',PREP:'hl-p',CONJ:'hl-p',SCONJ:'hl-p',NEG:'hl-p',PUNCT:'',NUM:''};
+
+function getPos(word){
+  const w=word.toLowerCase().replace(/[^a-z']/g,'');
+  if(POS_MAP[w]) return POS_MAP[w];
+  if(/^\d+$/.test(word)) return 'NUM';
+  if(/[.!?,;:]/.test(word)) return 'PUNCT';
+  if(w.endsWith('ly')) return 'ADV';
+  if(w.endsWith('ing')||w.endsWith('ed')||w.endsWith('en')) return 'VERB';
+  if(w.endsWith('tion')||w.endsWith('ment')||w.endsWith('ness')||w.endsWith('ity')||w.endsWith('er')||w.endsWith('or')) return 'NOUN';
+  if(w.endsWith('ous')||w.endsWith('al')||w.endsWith('ive')||w.endsWith('ful')||w.endsWith('less')) return 'ADJ';
+  return 'NOUN';// default
+}
+
+function posTagger(){
+  const t=document.getElementById('pos-in').value.trim();
+  if(!t){out('pos-out','Enter a sentence.');return;}
+  const tokens=t.match(/[\w']+|[.!?,;:]/g)||[];
+  const taggedHtml=tokens.map(tok=>{
+    const pos=getPos(tok);
+    const cls=POS_COLORS[pos]||'highlight';
+    return `<span class="${cls}" title="${pos}" style="cursor:help;">${tok}</span><sub style="font-size:.6rem;color:var(--text3);">${pos}</sub>`;
+  }).join(' ');
+  const counts={};
+  tokens.forEach(t=>{const p=getPos(t);counts[p]=(counts[p]||0)+1;});
+  const countHtml=Object.entries(counts).map(([k,v])=>`${tag(k+': '+v,'cyan')}`).join(' ');
+  out('pos-out',`${taggedHtml}\n\n${h('Tag counts:')} ${countHtml}`);
+}
+
+function phraseTree(){
+  const s=document.getElementById('pst-in').value.trim();
+  if(!s){out('pst-out','Enter a sentence.');return;}
+  // Very simple tree for common patterns
+  const tokens=s.match(/[\w']+/g)||[];
+  const tagged=tokens.map(t=>({w:t,pos:getPos(t)}));
+  // Build a simple S → NP VP tree
+  let npEnd=0, found=false;
+  for(let i=0;i<tagged.length;i++){
+    if(tagged[i].pos==='VERB'||tagged[i].pos==='AUX'||tagged[i].pos==='MODAL'){npEnd=i;found=true;break;}
+  }
+  if(!found) npEnd=Math.floor(tagged.length/2);
+  const np=tagged.slice(0,npEnd);
+  const vp=tagged.slice(npEnd);
+  function makeNode(label,cls,children){
+    let html=`<div class="tree-node">`;
+    html+=`<div class="tree-label ${cls}">${label}</div>`;
+    if(children.length){
+      html+=`<div class="tree-children" style="${children.length>1?'border-top:1px solid var(--text3);padding-top:16px;':'padding-top:16px;'}">`;
+      children.forEach(c=>html+=c);
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+    return html;
+  }
+  function wordNode(w,pos){return makeNode(w,'cat-word',[]);}
+  // NP nodes
+  const npNodes=np.map(t=>makeNode(t.pos==='NOUN'?'N\'':t.pos==='DET'?'Det':t.pos==='ADJ'?'A\'':t.pos,'cat-'+t.pos.toLowerCase()==='cat-'?'cat-N':('cat-'+t.pos.toLowerCase().replace('det','NP').replace('noun','N').replace('adj','AP').replace('adv','AP')),[wordNode(t.w,t.pos)]));
+  const vpNodes=vp.map(t=>makeNode(t.pos==='VERB'?'V\'':t.pos==='NOUN'?'N\'':t.pos==='DET'?'Det':t.pos,'cat-'+t.pos.toLowerCase(),[wordNode(t.w,t.pos)]));
+  const npTree=makeNode('NP','cat-NP',npNodes);
+  const vpTree=makeNode('VP','cat-VP',vpNodes);
+  const sTree=makeNode('S','cat-S',[npTree,vpTree]);
+  out('pst-out',`<div style="overflow-x:auto;text-align:center;padding:12px;">${sTree}</div>`);
+}
+
+function constituencyTests(){
+  const s=document.getElementById('const-in').value.trim();
+  if(!s){out('const-out','Enter a sentence.');return;}
+  const words=s.split(/\s+/);
+  out('const-out',
+    `${h('Input:')} "${s}"\n\n`+
+    `${h('Constituency Tests:')}\n\n`+
+    `${h('1. Substitution Test:')} Replace suspected constituent with pronoun\n`+
+    `   "${words.slice(0,Math.ceil(words.length/3)).join(' ')}" → it/they/this\n\n`+
+    `${h('2. Movement / Topicalization:')} Move to front\n`+
+    `   It was [${words.slice(Math.floor(words.length/3),Math.ceil(words.length*2/3)).join(' ')}] that…\n\n`+
+    `${h('3. Stand-alone Test:')} Can it answer a question?\n`+
+    `   Q: What did they do? → [${words.slice(Math.floor(words.length/2)).join(' ')}]\n\n`+
+    `${h('4. Coordination Test:')} [NP] and [NP] are…\n`+
+    `   The ${words[words.length-1]||'X'} and the ${words[words.length-1]||'X'} both…\n\n`+
+    `${h('Note:')} These tests identify phrase boundaries. Constituents that pass are syntactic units.`
+  );
+}
+
+function gramRelations(){
+  const s=document.getElementById('dep-in').value.trim();
+  if(!s){out('dep-out','Enter a sentence.');return;}
+  const tokens=s.match(/[\w']+/g)||[];
+  const tagged=tokens.map(t=>({w:t,pos:getPos(t)}));
+  const verb=tagged.find(t=>t.pos==='VERB'||t.pos==='AUX');
+  const subj=tagged.slice(0,tagged.indexOf(verb)).filter(t=>t.pos==='NOUN'||t.pos==='PRON').slice(-1)[0];
+  const obj=tagged.slice(tagged.indexOf(verb)+1).find(t=>t.pos==='NOUN'||t.pos==='PRON');
+  let res=`${h('Sentence:')} "${s}"\n\n`;
+  if(verb) res+=`${h('HEAD VERB:')} ${tag(verb.w,'green')}\n`;
+  if(subj) res+=`${h('SUBJECT (AGENT):')} ${tag(subj.w,'cyan')}\n`;
+  if(obj) res+=`${h('OBJECT (THEME):')} ${tag(obj.w,'violet')}\n`;
+  const prep=tagged.find(t=>t.pos==='PREP');
+  if(prep){
+    const pobj=tagged.slice(tagged.indexOf(prep)+1).find(t=>t.pos==='NOUN'||t.pos==='PRON');
+    if(pobj) res+=`${h('OBLIQUE (PP):')} [${prep.w} ${pobj.w}]\n`;
+  }
+  const adv=tagged.find(t=>t.pos==='ADV');
+  if(adv) res+=`${h('ADVERBIAL:')} ${tag(adv.w,'amber')}\n`;
+  res+=`\n${h('Structure:')} ${subj?subj.w:'(S)'} → ${verb?verb.w:'(V)'} → ${obj?obj.w:'(O/Ø)'}`;
+  out('dep-out',res);
+}
+
+function classifySentences(){
+  const t=document.getElementById('stype-in').value.trim();
+  if(!t){out('stype-out','Enter sentences.');return;}
+  const sents=t.match(/[^.!?]+[.!?]?/g)||[t];
+  let res='';
+  sents.forEach(s=>{
+    const clean=s.trim();
+    if(!clean) return;
+    let type='',struct='';
+    if(clean.endsWith('?')) type='INTERROGATIVE';
+    else if(clean.endsWith('!')) type='EXCLAMATORY';
+    else if(/^(be|stop|go|come|take|let|do|get|give|tell|make|look|sit|stand|wait)/i.test(clean)) type='IMPERATIVE';
+    else type='DECLARATIVE';
+    const tokens=clean.match(/[\w']+/g)||[];
+    const hasConj=tokens.some(t=>['and','but','or','nor','so','yet'].includes(t.toLowerCase()));
+    const hasSconj=tokens.some(t=>['because','although','though','if','when','while','that','since','unless','after','before','until'].includes(t.toLowerCase()));
+    const verbCount=(tokens.filter(t=>getPos(t)==='VERB'||getPos(t)==='AUX')).length;
+    if(hasSconj||verbCount>1) struct='COMPLEX';
+    else if(hasConj) struct='COMPOUND';
+    else struct='SIMPLE';
+    res+=`${tag(type,'cyan')} ${tag(struct,'violet')} ${h('"'+clean+'"')}\n`;
+  });
+  out('stype-out',res||'No sentences found.');
+}
+
+/* ══════════════════════════════════════════════
+   SEMANTICS TOOLS
+══════════════════════════════════════════════ */
+const LEX_DB={
+  happy:{syn:['joyful','pleased','content','cheerful','delighted','glad','elated'],ant:['sad','unhappy','miserable','sorrowful','gloomy'],hypo:['euphoric','ecstatic','blissful'],hyper:'emotion',coll:'very happy, feel happy, make happy'},
+  big:{syn:['large','huge','enormous','massive','great','vast'],ant:['small','tiny','little','minuscule','petite'],hypo:['gigantic','colossal','immense'],hyper:'size',coll:'big deal, big picture, big data, big mistake'},
+  walk:{syn:['stroll','wander','march','stride','amble','saunter','tread'],ant:['run','sprint','rush'],hypo:['swagger','limp','shuffle','trudge'],hyper:'movement',coll:'walk away, walk out, walk around'},
+  run:{syn:['sprint','dash','jog','race','bolt','hurry'],ant:['walk','crawl','stop'],hypo:['sprint','gallop','scurry'],hyper:'movement',coll:'run out, run away, run for'},
+  fast:{syn:['quick','rapid','swift','speedy','hasty'],ant:['slow','sluggish','leisurely'],hypo:['supersonic','breakneck'],hyper:'speed',coll:'fast food, fast lane, fast track'},
+  cold:{syn:['cool','chilly','freezing','icy','frigid'],ant:['hot','warm','scorching'],hypo:['arctic','glacial','frosty'],hyper:'temperature',coll:'cold weather, cold war, cold shoulder'},
+  eat:{syn:['consume','devour','ingest','dine','feast'],ant:['fast','starve'],hypo:['nibble','gorge','munch','gnaw'],hyper:'consumption',coll:'eat out, eat up, eat away'},
+  love:{syn:['adore','cherish','treasure','admire','like'],ant:['hate','despise','detest','loathe'],hypo:['worship','idolize'],hyper:'emotion',coll:'love life, fall in love, love story'},
+};
+function lexicalRelations(){
+  const w=document.getElementById('lex-in').value.trim().toLowerCase();
+  const db=LEX_DB[w];
+  if(!db){out('lex-out',`"${w}" is not in the lexical database. Try: ${Object.keys(LEX_DB).join(', ')}`);return;}
+  out('lex-out',
+    `${h('Word:')} ${w}\n\n`+
+    `${h('Synonyms:')} ${db.syn.map(s=>tag(s,'green')).join(' ')}\n`+
+    `${h('Antonyms:')} ${db.ant.map(a=>tag(a,'pink')).join(' ')}\n`+
+    `${h('Hyponyms:')} ${db.hypo.map(h=>tag(h,'violet')).join(' ')}\n`+
+    `${h('Hypernym:')} ${tag(db.hyper,'amber')}\n`+
+    `${h('Collocations:')} ${db.coll}\n\n`+
+    `${h('Definitions:')}\n`+
+    `  Synonymy: same or similar meaning\n`+
+    `  Antonymy: opposite meaning\n`+
+    `  Hyponymy: ${w} → [${db.hypo.join(', ')}] (${w} is the hypernym)\n`+
+    `  Hypernymy: ${w} is a kind of "${db.hyper}"`
+  );
+}
+
+function semFeatureMatrix(){
+  const words=document.getElementById('sfm-words').value.split(',').map(w=>w.trim()).filter(Boolean);
+  const feats=document.getElementById('sfm-feats').value.split(',').map(f=>f.trim()).filter(Boolean);
+  if(!words.length||!feats.length){out('sfm-out','Enter words and features.');return;}
+  // Preset semantic knowledge
+  const kb={
+    man:{HUMAN:'+',ADULT:'+',MALE:'+',ANIMATE:'+',FEMALE:'-'},
+    woman:{HUMAN:'+',ADULT:'+',MALE:'-',ANIMATE:'+',FEMALE:'+'},
+    boy:{HUMAN:'+',ADULT:'-',MALE:'+',ANIMATE:'+',FEMALE:'-'},
+    girl:{HUMAN:'+',ADULT:'-',MALE:'-',ANIMATE:'+',FEMALE:'+'},
+    dog:{HUMAN:'-',ADULT:'±',MALE:'±',ANIMATE:'+',FEMALE:'±'},
+    stone:{HUMAN:'-',ADULT:'-',MALE:'-',ANIMATE:'-',FEMALE:'-'},
+    king:{HUMAN:'+',ADULT:'+',MALE:'+',ANIMATE:'+',ROYAL:'+',FEMALE:'-'},
+    queen:{HUMAN:'+',ADULT:'+',MALE:'-',ANIMATE:'+',ROYAL:'+',FEMALE:'+'},
+    child:{HUMAN:'+',ADULT:'-',MALE:'±',ANIMATE:'+',FEMALE:'±'},
+  };
+  let html=`<table class="matrix-tbl"><tr><th>Word / Feature</th>`;
+  const cleanFeats=feats.map(f=>f.replace(/[^a-zA-Z]/g,'').toUpperCase());
+  cleanFeats.forEach(f=>html+=`<th>[${f}]</th>`);
+  html+='</tr>';
+  words.forEach(w=>{
+    const wl=w.toLowerCase();
+    html+=`<tr><td style="color:var(--cyan);font-weight:700;text-align:left;">${w}</td>`;
+    cleanFeats.forEach(f=>{
+      const val=(kb[wl]&&kb[wl][f])||'?';
+      html+=`<td class="${val==='+'?'plus':val==='-'?'minus':''}">${val}</td>`;
+    });
+    html+='</tr>';
+  });
+  html+='</table><div style="margin-top:8px;font-size:.72rem;color:var(--text3);">Preset data for: man,woman,boy,girl,dog,stone,king,queen,child. Others show "?".</div>';
+  out('sfm-out',html);
+}
+
+const THETA_DB={
+  'john gave mary a book':'Agent:John | Theme:a book | Goal:Mary | Beneficiary:Mary',
+  'the dog bit the man':'Agent:the dog | Patient:the man',
+  'she put the key on the table':'Agent:she | Theme:the key | Location:on the table',
+  'the wind blew the leaves':'Force/Cause:the wind | Patient/Theme:the leaves',
+  'he sent her flowers':'Agent:he | Goal/Recipient:her | Theme:flowers',
+};
+function thetaRoles(){
+  const s=document.getElementById('theta-in').value.trim();
+  const key=s.toLowerCase().replace(/[^a-z ]/g,'');
+  const db=THETA_DB[key];
+  if(db){
+    const parts=db.split('|');
+    const html=parts.map(p=>{
+      const [role,filler]=p.split(':');
+      return `${h(role.trim()+':')} ${tag(filler.trim(),'cyan')}`;
+    }).join('\n');
+    out('theta-out',`${h('Sentence:')} "${s}"\n\n${h('Thematic Grid:')}\n${html}\n\n`+
+      `${h('Thematic Roles Reference:')}\nAgent (volitional causer), Patient/Theme (entity affected), Goal (endpoint of motion), Source (start of motion), Location (place), Experiencer (mental state), Beneficiary (entity benefiting)`
+    );
+  } else {
+    // Generic heuristic
+    const tokens=s.match(/[\w']+/g)||[];
+    const tagged=tokens.map(t=>({w:t,pos:getPos(t)}));
+    const verb=tagged.find(t=>t.pos==='VERB');
+    const subj=tagged.slice(0,tagged.indexOf(verb)).filter(t=>t.pos==='NOUN'||t.pos==='PRON').pop();
+    const obj=tagged.slice(tagged.indexOf(verb)+1).find(t=>t.pos==='NOUN'||t.pos==='PRON');
+    out('theta-out',
+      `${h('Sentence:')} "${s}"\n\n`+
+      `${h('Heuristic Theta Roles:')}\n`+
+      `${subj?h('Agent/Experiencer: ')+''+tag(subj.w,'cyan')+'\n':''}`+
+      `${verb?h('Predicate: ')+''+tag(verb.w,'green')+'\n':''}`+
+      `${obj?h('Theme/Patient: ')+''+tag(obj.w,'violet')+'\n':''}`+
+      `\n${h('Note:')} Full theta role assignment requires lexical semantics of the verb.`
+    );
+  }
+}
+
+function checkEntailment(){
+  const p=document.getElementById('ent-p').value.trim();
+  const q=document.getElementById('ent-q').value.trim();
+  if(!p||!q){out('ent-out','Enter both propositions.');return;}
+  // Heuristic factive/presupposition checks
+  const factives=['know','realize','discover','regret','be aware','stop','continue','begin'];
+  const factive=factives.some(f=>p.toLowerCase().includes(f));
+  out('ent-out',
+    `${h('P:')} "${p}"\n${h('Q:')} "${q}"\n\n`+
+    `${h('Analysis:')}\n`+
+    `${factive?`• P likely ${h('PRESUPPOSES','hl-a')} that something was the case (factive/aspectual verb)\n`:''}` +
+    `• If P is true, does Q necessarily follow? → ${h('ENTAILMENT CHECK','hl-g')}\n`+
+    `• If P is true/false, is Q still taken for granted? → ${h('PRESUPPOSITION CHECK','hl-a')}\n\n`+
+    `${h('Entailment:')} P ⊨ Q means Q is true in every world where P is true.\n`+
+    `${h('Presupposition:')} P >>Q means Q is assumed true even if P is negated.\n`+
+    `${h('Implicature:')} P +>Q means Q is suggested but not logically necessitated.\n\n`+
+    `${h('Negation Test for Presupposition:')}\n`+
+    `Negate P: "It is not the case that ${p.toLowerCase()}" — does Q still hold?\nIf yes → Q is a presupposition of P.`
+  );
+}
+
+const SF_DB={
+  war:{words:['battle','soldier','enemy','weapon','fight','army','peace','victory','defeat','treaty','conflict','bomb','attack','defense','strategy']},
+  love:{words:['heart','romance','kiss','affection','devotion','passion','desire','care','tender','embrace','beloved','attachment','longing','adore']},
+  food:{words:['eat','meal','taste','hunger','cook','recipe','ingredient','flavor','restaurant','cuisine','nutrition','diet','appetite','feast','dish']},
+  time:{words:['past','future','present','moment','hour','minute','second','duration','period','era','age','cycle','rhythm','delay','sequence']},
+  money:{words:['wealth','currency','bank','invest','debt','profit','economy','trade','market','budget','earn','spend','save','coin','finance']},
+  water:{words:['ocean','river','lake','rain','stream','flood','wet','liquid','flow','wave','drop','moisture','tide','current','pool']},
+  mind:{words:['thought','idea','perception','memory','consciousness','knowledge','emotion','dream','intelligence','reason','belief','imagination','awareness','cognition']},
+};
+function semanticField(){
+  const w=document.getElementById('sf-in').value.trim().toLowerCase();
+  const db=SF_DB[w];
+  if(!db){out('sf-out',`"${w}" not in database. Try: ${Object.keys(SF_DB).join(', ')}`);return;}
+  const cloud=db.words.map(wd=>tag(wd,'cyan')).join(' ');
+  out('sf-out',
+    `${h('Semantic Field of:')} "${w}"\n\n`+
+    `${cloud}\n\n`+
+    `${h('Semantic Field:')} A set of words covering a particular conceptual domain.\nWords share semantic features or refer to related concepts.\n`+
+    `${h('Field size:')} ${db.words.length} related lexemes`
+  );
+}
+
+const POLY_DB={
+  bank:{type:'POLYSEMY',senses:['financial institution','riverbank/edge of water','to tilt/turn (aviation)','to depend on (bank on)'],note:'Same form, historically related senses'},
+  bat:{type:'HOMONYMY',senses:['flying nocturnal mammal','sports equipment (cricket/baseball bat)'],note:'Different etymologies, same phonological form'},
+  right:{type:'POLYSEMY',senses:['direction (opposite of left)','correct/true','legal entitlement','immediately (right now)'],note:'Core concept: straightness/correctness — related senses'},
+  date:{type:'POLYSEMY',senses:['calendar date','romantic appointment','fruit of date palm'],note:'Likely polysemous — the fruit sense is often debated as homonymy'},
+  light:{type:'POLYSEMY',senses:['electromagnetic radiation','not heavy','pale in color','to ignite','trivial/unimportant'],note:'Multiple related senses extending from core "light" concept'},
+  bear:{type:'HOMONYMY',senses:['large mammal','to carry/endure'],note:'Different etymologies — Old English beran (carry) vs Proto-Germanic (the animal)'},
+  can:{type:'POLYSEMY',senses:['modal auxiliary (ability)','metal container','to fire/dismiss (informal)'],note:'Core modal vs container senses — possibly homonymous'},
+  match:{type:'POLYSEMY',senses:['to be equal/compatible','sporting contest','small fire-lighting stick'],note:'All senses relate to equality/fitting together — polysemous'},
+};
+function polysemyCheck(){
+  const w=document.getElementById('poly-in').value.trim().toLowerCase();
+  const db=POLY_DB[w];
+  if(!db){out('poly-out',`"${w}" not in database. Try: ${Object.keys(POLY_DB).join(', ')}`);return;}
+  const senseHtml=db.senses.map((s,i)=>`  ${h(i+1+'.'),'highlight'} ${s}`).join('\n');
+  out('poly-out',
+    `${h('Word:')} ${w}\n${h('Classification:')} ${tag(db.type,db.type==='POLYSEMY'?'cyan':'pink')}\n\n`+
+    `${h('Senses:')}\n${db.senses.map((s,i)=>`  ${i+1}. ${s}`).join('\n')}\n\n`+
+    `${h('Note:')} ${db.note}\n\n`+
+    `${h('Polysemy:')} One form, multiple related senses (historical connection)\n`+
+    `${h('Homonymy:')} One form, multiple unrelated senses (different etymologies)`
+  );
+}
+
+/* ══════════════════════════════════════════════
+   PRAGMATICS TOOLS
+══════════════════════════════════════════════ */
+function speechAct(){
+  const u=document.getElementById('sa-in').value.trim();
+  if(!u){out('sa-out','Enter an utterance.');return;}
+  const ul=u.toLowerCase();
+  let illocution='',force='',austin='';
+  // Classify by patterns
+  if(/\bi promise\b|\bi swear\b|\bi commit\b|\bi guarantee\b/.test(ul)){
+    illocution='COMMISSIVE'; force='Promise'; austin='Commissive';
+  } else if(/\bi hereby\b|\bi declare\b|\bi now pronounce\b|\bi sentence\b|\bi order\b/.test(ul)){
+    illocution='DECLARATION'; force='Declaration'; austin='Declarative';
+  } else if(/thank|grateful|sorry|apologize|congratulat|welcome/.test(ul)){
+    illocution='EXPRESSIVE'; force='Expressive act'; austin='Expressive';
+  } else if(/^(please|would you|could you|can you|would you mind|i'd like you to|i need you to|stop|go|come|sit|stand|bring|take|give me|help me)/i.test(u)){
+    illocution='DIRECTIVE'; force='Request/Command'; austin='Directive';
+  } else if(u.endsWith('?')||(ul.startsWith('is ')||ul.startsWith('are ')||ul.startsWith('do ')||ul.startsWith('does ')||ul.startsWith('did ')||ul.startsWith('can ')||ul.startsWith('could ')||ul.startsWith('would ')||ul.startsWith('will ')||ul.startsWith('who ')||ul.startsWith('what ')||ul.startsWith('where ')||ul.startsWith('when ')||ul.startsWith('why ')||ul.startsWith('how '))){
+    illocution='DIRECTIVE'; force='Question'; austin='Directive';
+  } else {
+    illocution='ASSERTIVE'; force='Statement/Assertion'; austin='Assertive';
+  }
+  out('sa-out',
+    `${h('Utterance:')} "${u}"\n\n`+
+    `${h('Illocutionary Force:')} ${tag(illocution,'cyan')}\n`+
+    `${h('Speech Act Type:')} ${tag(force,'violet')}\n`+
+    `${h('Austin Category:')} ${tag(austin,'green')}\n\n`+
+    `${h('Levels of Speech Acts:')}\n`+
+    `  Locutionary: the literal meaning of the utterance\n`+
+    `  Illocutionary: the speaker's communicative intention (${illocution.toLowerCase()})\n`+
+    `  Perlocutionary: the effect on the hearer\n\n`+
+    `${h('Speech Act Types (Searle):')}\nAssertives | Directives | Commissives | Expressives | Declarations`
+  );
+}
+
+function griceAnalysis(){
+  const q=document.getElementById('grice-q').value.trim();
+  const a=document.getElementById('grice-a').value.trim();
+  if(!q||!a){out('grice-out','Enter both the question and the response.');return;}
+  const al=a.toLowerCase();
+  const wordCount=a.split(/\s+/).length;
+  let violations=[];
+  // Quantity
+  if(wordCount<3) violations.push({maxim:'Quantity',type:'VIOLATES',detail:'Response too brief — may be under-informative'});
+  else if(wordCount>60) violations.push({maxim:'Quantity',type:'FLOUTS',detail:'Response very lengthy — may be over-informative'});
+  // Quality
+  if(/i think|maybe|perhaps|i'm not sure|possibly|probably/.test(al)) violations.push({maxim:'Quality',type:'OBSERVES',detail:'Hedging markers suggest epistemic caution (good practice)'});
+  if(/never|always|everyone|nobody|absolutely/.test(al)) violations.push({maxim:'Quality',type:'RISKS VIOLATING',detail:'Absolute terms may be inaccurate'});
+  // Relation
+  const qWords=q.toLowerCase().split(/\s+/).filter(w=>w.length>3);
+  const overlap=qWords.filter(w=>al.includes(w)).length;
+  if(overlap===0) violations.push({maxim:'Relation (Relevance)',type:'POSSIBLY FLOUTS',detail:'Response may not directly address the question'});
+  // Manner
+  if(/[.!?,]{2,}/.test(a)) violations.push({maxim:'Manner',type:'RISKS',detail:'Punctuation suggests unclear expression'});
+  let html=`${h('Context Q:')} "${q}"\n${h('Response A:')} "${a}"\n\n${h("Grice's Maxim Analysis:")}\n\n`;
+  const maxims=['Quantity (be informative)','Quality (be truthful)','Relation (be relevant)','Manner (be clear)'];
+  const statuses=['quantity','quality','relevance','manner'].map(m=>{
+    const v=violations.find(v=>v.maxim.toLowerCase().includes(m));
+    return v?`${tag(v.maxim,'amber')} ${h(v.type,'hl-a')} — ${v.detail}`:null;
+  }).filter(Boolean);
+  html+=statuses.length?statuses.join('\n'):`${tag('All maxims appear observed','green')}\nThe response seems appropriately cooperative.\n`;
+  html+=`\n\n${h('Note:')} Maxim ${h('flouting','hl-a')} is deliberate; ${h('violating','hl-p')} is non-cooperative; ${h('opting out','hl-v')} is explicit refusal.`;
+  out('grice-out',html);
+}
+
+function detectImplicature(){
+  const conv=document.getElementById('impl-in').value.trim();
+  if(!conv){out('impl-out','Enter a conversational exchange.');return;}
+  const lines=conv.split('\n').filter(Boolean);
+  let html=`${h('Exchange:')}\n${lines.map(l=>`  ${l}`).join('\n')}\n\n`;
+  if(lines.length<2){out('impl-out',html+'Need at least two turns.');return;}
+  const bLine=lines[lines.length-1].replace(/^[AB]:\s*/i,'').trim();
+  const aLine=lines[0].replace(/^[AB]:\s*/i,'').trim();
+  html+=`${h('Implicature Analysis:')}\n\n`;
+  html+=`${h('Literal meaning (what is said):')} "${bLine}"\n\n`;
+  html+=`${h('Conversational implicature:')}\nGiven the question "${aLine}", the response "${bLine}" implicates:\n`;
+  html+=`→ The speaker deliberately chose NOT to give a direct answer.\n`;
+  html+=`→ This triggers an implicature via Grice's Maxim of Quantity/Relation.\n\n`;
+  html+=`${h('Types of implicature:')}\n`;
+  html+=`  ${tag('PARTICULARIZED','cyan')} — depends on context of this conversation\n`;
+  html+=`  ${tag('GENERALIZED','violet')} — applies by default in most contexts\n\n`;
+  html+=`${h('Cancellability test:')} Can you add "...but I didn't mean to imply that"?\nIf yes → conversational implicature (not entailment).`;
+  out('impl-out',html);
+}
+
+function deixisFind(){
+  const s=document.getElementById('deix-in').value.trim();
+  if(!s){out('deix-out','Enter a sentence.');return;}
+  const PERSON_DEIXIS=/\b(i|me|my|mine|myself|we|us|our|ours|you|your|yours|yourself|yourselves|he|she|him|her|his|hers|they|them|their)\b/gi;
+  const SPATIAL_DEIXIS=/\b(here|there|this|that|these|those|near|far|come|go|bring|take|above|below)\b/gi;
+  const TEMPORAL_DEIXIS=/\b(now|then|today|yesterday|tomorrow|soon|recently|already|still|yet|before|after|ago|later|next|last|this year|this month|this week)\b/gi;
+  const DISCOURSE_DEIXIS=/\b(as follows|the following|in conclusion|above|below|aforementioned|this point|that argument)\b/gi;
+  const person=[...s.matchAll(PERSON_DEIXIS)].map(m=>m[0]);
+  const spatial=[...s.matchAll(SPATIAL_DEIXIS)].map(m=>m[0]);
+  const temporal=[...s.matchAll(TEMPORAL_DEIXIS)].map(m=>m[0]);
+  const discourse=[...s.matchAll(DISCOURSE_DEIXIS)].map(m=>m[0]);
+  let html=`${h('Sentence:')} "${s}"\n\n${h('Deictic Expressions:')}\n\n`;
+  if(person.length) html+=`${h('PERSON DEIXIS:')} ${[...new Set(person)].map(w=>tag(w,'cyan')).join(' ')}\n  → Refers to participants in the speech event\n\n`;
+  if(spatial.length) html+=`${h('SPATIAL/PLACE DEIXIS:')} ${[...new Set(spatial)].map(w=>tag(w,'green')).join(' ')}\n  → Refers to location relative to speaker\n\n`;
+  if(temporal.length) html+=`${h('TEMPORAL DEIXIS:')} ${[...new Set(temporal)].map(w=>tag(w,'amber')).join(' ')}\n  → Refers to time relative to utterance time\n\n`;
+  if(discourse.length) html+=`${h('DISCOURSE DEIXIS:')} ${[...new Set(discourse)].map(w=>tag(w,'violet')).join(' ')}\n  → Refers to portions of discourse\n\n`;
+  if(!person.length&&!spatial.length&&!temporal.length&&!discourse.length) html+=`No common deictic expressions detected.\n`;
+  html+=`${h('Note:')} Deixis is context-dependent — interpretation requires knowledge of the speech situation (speaker, location, time).`;
+  out('deix-out',html);
+}
+
+function politenessAnalyze(){
+  const u=document.getElementById('pol-in').value.trim();
+  if(!u){out('pol-out','Enter an utterance.');return;}
+  const ul=u.toLowerCase();
+  let strategies=[];
+  // Brown & Levinson politeness strategies
+  if(/please/.test(ul)) strategies.push({s:'Conventional indirectness',type:'negative',note:'"please" softens the imposition'});
+  if(/i was wondering|i wonder if|i don't suppose|do you think you could|any chance/.test(ul)) strategies.push({s:'Hedge/Indirectness',type:'negative',note:'Reduces the directness of the request'});
+  if(/perhaps|maybe|possibly/.test(ul)) strategies.push({s:'Epistemic hedging',type:'negative',note:'Leaves room for doubt'});
+  if(/could you|would you|might you/.test(ul)) strategies.push({s:'Indirect speech act (ability question)',type:'negative',note:'Questions ability instead of making direct command'});
+  if(/we|let's|shall we/.test(ul)) strategies.push({s:'Inclusive "we" / solidarity',type:'positive',note:'Emphasizes common ground'});
+  if(/you know|you see|right\?|isn't it/.test(ul)) strategies.push({s:'Seek agreement / tag question',type:'positive',note:'Assumes shared perspective'});
+  if(/sorry|excuse me|pardon/.test(ul)) strategies.push({s:'Apologize / Pre-apology',type:'negative',note:'Acknowledges imposition'});
+  if(/i'm afraid|i regret/.test(ul)) strategies.push({s:'Pessimism',type:'negative',note:'Assumes negative outcome out of politeness'});
+  const directness=ul.split(/\s+/).length<5&&!ul.includes('please')&&!ul.includes('could')&&!ul.includes('would')?'BALD ON-RECORD':'INDIRECT/MITIGATED';
+  let html=`${h('Utterance:')} "${u}"\n\n${h('Directness Level:')} ${tag(directness,directness==='BALD ON-RECORD'?'pink':'green')}\n\n`;
+  if(strategies.length){
+    html+=`${h('Politeness Strategies (Brown & Levinson):')}\n`;
+    strategies.forEach(s=>{
+      html+=`  ${tag(s.type.toUpperCase(),'cyan')} ${h(s.s,'hl-v')} — ${s.note}\n`;
+    });
+  } else {
+    html+=`${h('Strategy:')} ${tag('BALD ON-RECORD','amber')} — Direct expression without mitigation.\n`;
+  }
+  html+=`\n${h('Face Threat Analysis:')}\n  Face Threatening Act (FTA) to: ${/\b(you|your)\b/.test(ul)?'HEARER\'s negative face (imposition)':'SPEAKER\'s own face'}\n`;
+  html+=`  Mitigation level: ${strategies.length===0?'None':strategies.length<=2?'Moderate':'High'}\n\n`;
+  html+=`${h('Positive Face:')} want to be liked/approved\n${h('Negative Face:')} want to be unimposed upon`;
+  out('pol-out',html);
+}
+
+/* ══════════════════════════════════════════════
+   DISCOURSE TOOLS
+══════════════════════════════════════════════ */
+function cohesionAnalyze(){
+  const t=document.getElementById('coh-in').value.trim();
+  if(!t){out('coh-out','Paste a paragraph.');return;}
+  const sentences=t.match(/[^.!?]+[.!?]?/g)||[t];
+  const words=t.toLowerCase().match(/\b\w+\b/g)||[];
+  // Reference: pronouns
+  const pronouns=['he','she','it','they','him','her','them','his','hers','its','their','this','that','these','those','who','which','whose'];
+  const refWords=words.filter(w=>pronouns.includes(w));
+  // Substitution/Ellipsis markers
+  const subst=['so','one','ones','do so','same'];
+  const substW=words.filter(w=>subst.includes(w));
+  // Conjunction
+  const conjList=['and','but','or','however','therefore','thus','consequently','moreover','furthermore','although','nevertheless','meanwhile','in addition','in contrast','on the other hand','for example','for instance','in conclusion','finally','firstly','secondly'];
+  const conjW=[];
+  conjList.forEach(c=>{if(t.toLowerCase().includes(c))conjW.push(c);});
+  // Lexical cohesion: reiteration
+  const wordFreq={};
+  words.forEach(w=>{if(w.length>4)wordFreq[w]=(wordFreq[w]||0)+1;});
+  const repeated=Object.entries(wordFreq).filter(([w,c])=>c>1).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const refHtml=refWords.length?[...new Set(refWords)].map(w=>tag(w,'cyan')).join(' '):'none detected';
+  const conjHtml=conjW.length?conjW.map(w=>tag(w,'violet')).join(' '):'none detected';
+  const lexHtml=repeated.length?repeated.map(([w,c])=>tag(`${w}(×${c})`,'green')).join(' '):'none';
+  out('coh-out',
+    `${h('Cohesive Devices (Halliday & Hasan, 1976):')}\n\n`+
+    `${h('1. REFERENCE:')} ${refHtml}\n   → Anaphoric/cataphoric references\n\n`+
+    `${h('2. SUBSTITUTION/ELLIPSIS:')} ${substW.length?[...new Set(substW)].map(w=>tag(w,'amber')).join(' '):'minimal'}\n\n`+
+    `${h('3. CONJUNCTION:')} ${conjHtml}\n   → Additive, adversative, causal, temporal\n\n`+
+    `${h('4. LEXICAL COHESION:')} ${lexHtml}\n   → Reiteration & Collocation\n\n`+
+    `${h('5. TEXT STATISTICS:')}\n`+
+    `   Sentences: ${sentences.length}   Tokens: ${words.length}\n`+
+    `   Avg sentence length: ${(words.length/sentences.length).toFixed(1)} words\n`+
+    `   Cohesive density: ${((refWords.length+conjW.length)/sentences.length).toFixed(2)} devices/sentence`
+  );
+}
+
+const DM_DB={
+  additive:['and','also','in addition','furthermore','moreover','additionally','besides','as well','likewise','similarly','not only'],
+  adversative:['but','however','yet','although','though','even though','nevertheless','nonetheless','on the other hand','in contrast','despite','whereas','while'],
+  causal:['because','therefore','thus','hence','consequently','as a result','so','for this reason','owing to','due to','since','given that'],
+  temporal:['then','next','after','before','when','while','meanwhile','subsequently','previously','first','second','finally','at last','eventually','soon'],
+  exemplifying:['for example','for instance','such as','namely','in particular','specifically','to illustrate'],
+  summarizing:['in conclusion','in summary','to sum up','overall','in brief','in short','on the whole','to conclude'],
+};
+function discourseMarkers(){
+  const t=document.getElementById('dm-in').value.trim();
+  if(!t){out('dm-out','Paste text.');return;}
+  const tl=t.toLowerCase();
+  let html=`${h('Discourse Markers Identified:')}\n\n`;
+  let total=0;
+  Object.entries(DM_DB).forEach(([type,markers])=>{
+    const found=markers.filter(m=>tl.includes(m));
+    if(found.length){
+      html+=`${h(type.toUpperCase()+':')} ${found.map(m=>tag(m,'cyan')).join(' ')}\n`;
+      total+=found.length;
+    }
+  });
+  if(total===0) html+=`No common discourse markers detected.\n`;
+  html+=`\n${h('Total DMs found:')} ${total}\n\n`;
+  html+=`${h('Functions of Discourse Markers:')}\nThey signal: logical relationships, topic shifts, stance, sequential structure, and rhetorical purpose.`;
+  out('dm-out',html);
+}
+
+function registerAnalyze(){
+  const t=document.getElementById('reg-in').value.trim();
+  if(!t){out('reg-out','Paste text.');return;}
+  const words=t.toLowerCase().match(/\b\w+\b/g)||[];
+  const sents=t.match(/[^.!?]+[.!?]/g)||[t];
+  const avgLen=words.length/sents.length;
+  const avgWordLen=words.reduce((a,w)=>a+w.length,0)/words.length;
+  const passiveIndicators=(t.match(/\b(is|are|was|were|been|be)\s+\w+ed\b/g)||[]).length;
+  const firstPerson=(t.match(/\b(I|we|me|us|my|our)\b/g)||[]).length;
+  const hedges=(t.match(/\b(perhaps|maybe|possibly|might|could|seem|appear|suggest|indicate)\b/gi)||[]).length;
+  const techTerms=(t.match(/\b\w{10,}\b/g)||[]).length;
+  // Field
+  const field=techTerms>3?'Technical/Specialist':'General/Non-specialist';
+  // Tenor
+  const tenor=firstPerson>2&&avgLen<15?'Informal/Personal':passiveIndicators>1||hedges>2?'Formal/Academic':'Semi-formal';
+  // Mode
+  const mode=avgLen>20?'Written (planned)':avgLen<12?'Spoken-like (unplanned)':'Written/Spoken blend';
+  out('reg-out',
+    `${h('Register Analysis (Systemic Functional Linguistics):')}\n\n`+
+    `${h('FIELD (subject matter & activity):')}\n`+
+    `  ${tag(field,'cyan')} | Tech terms (10+ chars): ${techTerms} | Avg word length: ${avgWordLen.toFixed(1)}\n\n`+
+    `${h('TENOR (relationship between participants):')}\n`+
+    `  ${tag(tenor,'violet')} | 1st-person uses: ${firstPerson} | Passive structures: ${passiveIndicators} | Hedges: ${hedges}\n\n`+
+    `${h('MODE (role of language, channel):')}\n`+
+    `  ${tag(mode,'green')} | Avg sentence length: ${avgLen.toFixed(1)} words\n\n`+
+    `${h('Formality Score:')} ${Math.min(10,Math.round((passiveIndicators*2+techTerms+hedges*1.5-firstPerson*.5))).toString()}/10 (higher = more formal)`
+  );
+}
+
+function topicComment(){
+  const s=document.getElementById('tc-in').value.trim();
+  if(!s){out('tc-out','Enter a sentence.');return;}
+  const tokens=s.match(/[\w']+/g)||[];
+  // Topicalization markers
+  const topicMarkers=/^(as for|as regards|speaking of|regarding|about|concerning|when it comes to|talking about)/i;
+  const isTopicalized=topicMarkers.test(s);
+  let topic='',comment='';
+  if(isTopicalized){
+    const match=s.match(/^[^,]+,?\s*/);
+    topic=match?match[0].trim():tokens.slice(0,2).join(' ');
+    comment=s.slice(topic.length).trim();
+  } else if(tokens.length>0){
+    const tagged=tokens.map(t=>({w:t,pos:getPos(t)}));
+    const verbIdx=tagged.findIndex(t=>t.pos==='VERB'||t.pos==='AUX');
+    topic=tokens.slice(0,verbIdx>0?verbIdx:Math.ceil(tokens.length/2)).join(' ');
+    comment=tokens.slice(verbIdx>0?verbIdx:Math.ceil(tokens.length/2)).join(' ');
+  }
+  out('tc-out',
+    `${h('Sentence:')} "${s}"\n\n`+
+    `${h('TOPIC (what the sentence is about):')}\n  ${tag(topic,'cyan')}\n\n`+
+    `${h('COMMENT (what is said about the topic):')}\n  ${tag(comment,'green')}\n\n`+
+    `${isTopicalized?h('⚠ Topicalization detected: ')+'marked topic-fronting construction\n':''}`+
+    `${h('Theme/Rheme (Halliday):')}\n  Theme = first constituent = "${tokens[0]}"\n  Rheme = rest of sentence\n\n`+
+    `${h('Given/New:')}\n  Given = shared knowledge between speaker/hearer\n  New = information being introduced`
+  );
+}
+
+function coherenceCheck(){
+  const t=document.getElementById('coher-in').value.trim();
+  if(!t){out('coher-out','Paste text.');return;}
+  const sents=t.match(/[^.!?]+[.!?]?/g)||[t];
+  let score=0, issues=[];
+  // Check topic continuity (word overlap between adjacent sentences)
+  for(let i=1;i<sents.length;i++){
+    const prev=new Set(sents[i-1].toLowerCase().match(/\b\w{4,}\b/g)||[]);
+    const curr=new Set(sents[i].toLowerCase().match(/\b\w{4,}\b/g)||[]);
+    const overlap=[...prev].filter(w=>curr.has(w)).length;
+    if(overlap===0&&i>0) issues.push(`Sentence ${i+1} may lack connection to sentence ${i} (no lexical overlap)`);
+    else score+=overlap;
+  }
+  // Check length variance
+  const lens=sents.map(s=>s.trim().split(/\s+/).length);
+  const maxLen=Math.max(...lens);
+  const minLen=Math.min(...lens);
+  if(maxLen/minLen>5) issues.push(`High sentence length variation (min:${minLen}, max:${maxLen}) may affect readability`);
+  const avgScore=sents.length>1?score/(sents.length-1):score;
+  const coherenceLevel=avgScore>2?'HIGH':avgScore>1?'MODERATE':'LOW';
+  out('coher-out',
+    `${h('Coherence Analysis:')}\n\n`+
+    `${h('Sentences analyzed:')} ${sents.length}\n`+
+    `${h('Avg lexical overlap:')} ${avgScore.toFixed(2)} words/sentence pair\n`+
+    `${h('Coherence Level:')} ${tag(coherenceLevel,coherenceLevel==='HIGH'?'green':coherenceLevel==='MODERATE'?'amber':'pink')}\n\n`+
+    `${issues.length?h('Issues detected:\n')+issues.map(i=>`  ⚠ ${i}`).join('\n'):h('No major coherence issues detected.')}\n\n`+
+    `${h('Coherence dimensions:')}\n`+
+    `  Local coherence: sentence-to-sentence connectedness ✓\n`+
+    `  Global coherence: overall topic unity (requires semantic analysis)\n`+
+    `  Relational coherence: rhetorical relations (Elaboration, Contrast, Cause…)`
+  );
+}
+
+/* ══════════════════════════════════════════════
+   CORPUS TOOLS
+══════════════════════════════════════════════ */
+const STOP_WORDS=new Set(['i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','about','against','between','into','through','during','before','after','above','below','to','from','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','s','t','can','will','just','don','should','now','d','ll','m','o','re','ve','y','ain','aren','couldn','didn','doesn','hadn','hasn','haven','isn','ma','mightn','mustn','needn','shan','shouldn','wasn','weren','won','wouldn']);
+
+function tokenize(text){
+  return text.toLowerCase().match(/\b[a-z]+\b/g)||[];
+}
+
+function wordFrequency(){
+  const t=document.getElementById('freq-in').value.trim()||corpusLoaded;
+  if(!t){out('freq-out','Load corpus or paste text.');return;}
+  const ci=document.getElementById('freq-ci').checked;
+  const sw=document.getElementById('freq-sw').checked;
+  const top=parseInt(document.getElementById('freq-top').value)||30;
+  let words=ci?tokenize(t):t.match(/\b\w+\b/g)||[];
+  if(sw) words=words.filter(w=>!STOP_WORDS.has(w.toLowerCase()));
+  const freq={};
+  words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,top);
+  const maxF=sorted[0]?.[1]||1;
+  let html=`${h('Top '+Math.min(top,sorted.length)+' words (total tokens: '+words.length+'):\n\n')}`;
+  sorted.forEach(([w,c],i)=>{
+    const pct=((c/words.length)*100).toFixed(2);
+    const barW=Math.round((c/maxF)*100);
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin:3px 0;">`;
+    html+=`<span style="width:20px;text-align:right;color:var(--text3);font-size:.7rem;">${i+1}</span>`;
+    html+=`<span style="min-width:120px;color:var(--cyan);">${w}</span>`;
+    html+=`<div style="flex:1;background:rgba(0,212,255,.08);border-radius:2px;height:14px;max-width:200px;">`;
+    html+=`<div style="width:${barW}%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:2px;"></div></div>`;
+    html+=`<span style="color:var(--text2);font-size:.75rem;min-width:40px;">${c}</span>`;
+    html+=`<span style="color:var(--text3);font-size:.7rem;">${pct}%</span>`;
+    html+='</div>';
+  });
+  out('freq-out',html);
+}
+
+function kwicSearch(){
+  const text=corpusLoaded||document.getElementById('kwic-in')?.value||'';
+  const kw=document.getElementById('kwic-kw').value.trim().toLowerCase();
+  const ctx=parseInt(document.getElementById('kwic-ctx').value)||6;
+  if(!kw){out('kwic-out','Enter a keyword.');return;}
+  if(!text){out('kwic-out','Load corpus first (paste into Corpus Input and click Load).');return;}
+  const tokens=text.match(/\S+/g)||[];
+  const results=[];
+  tokens.forEach((t,i)=>{
+    if(t.toLowerCase().replace(/[^a-z]/g,'')===kw||t.toLowerCase()===kw){
+      const left=tokens.slice(Math.max(0,i-ctx),i).join(' ');
+      const right=tokens.slice(i+1,i+ctx+1).join(' ');
+      results.push({left,key:t,right});
+    }
+  });
+  if(!results.length){out('kwic-out',`No occurrences of "${kw}" found.`);return;}
+  let html=`${h('Keyword: "'+kw+'" — '+results.length+' occurrence(s)\n\n')}`;
+  results.slice(0,50).forEach(r=>{
+    html+=`<div class="kwic-row">`;
+    html+=`<div class="kwic-left">${r.left}</div>`;
+    html+=`<div class="kwic-key">${r.key}</div>`;
+    html+=`<div class="kwic-right">${r.right}</div>`;
+    html+=`</div>`;
+  });
+  if(results.length>50) html+=`\n${h('Showing 50 of '+results.length+' concordance lines.')}`;
+  out('kwic-out',html);
+}
+
+function ngramExtract(){
+  const t=document.getElementById('ngram-in').value.trim()||corpusLoaded;
+  const n=parseInt(document.getElementById('ngram-n').value)||2;
+  const top=parseInt(document.getElementById('ngram-top').value)||25;
+  if(!t){out('ngram-out','Load corpus or paste text.');return;}
+  const tokens=tokenize(t);
+  const grams={};
+  for(let i=0;i<=tokens.length-n;i++){
+    const gram=tokens.slice(i,i+n).join(' ');
+    grams[gram]=(grams[gram]||0)+1;
+  }
+  const sorted=Object.entries(grams).sort((a,b)=>b[1]-a[1]).slice(0,top);
+  let html=`${h('Top '+Math.min(top,sorted.length)+' '+n+'-grams:\n\n')}`;
+  sorted.forEach(([g,c],i)=>{
+    html+=`<div style="display:flex;gap:8px;align-items:center;margin:3px 0;">`;
+    html+=`<span style="width:20px;text-align:right;color:var(--text3);font-size:.7rem;">${i+1}</span>`;
+    html+=`<span style="flex:1;color:var(--cyan);">${g}</span>`;
+    html+=`<span style="color:var(--text2);">${c}</span>`;
+    html+=`</div>`;
+  });
+  out('ngram-out',html);
+}
+
+function collocFinder(){
+  const text=corpusLoaded;
+  const kw=document.getElementById('colloc-kw').value.trim().toLowerCase();
+  const win=parseInt(document.getElementById('colloc-win').value)||3;
+  const minFreq=parseInt(document.getElementById('colloc-min').value)||2;
+  if(!kw){out('colloc-out','Enter a node word.');return;}
+  if(!text){out('colloc-out','Load corpus first.');return;}
+  const tokens=text.toLowerCase().match(/\b\w+\b/g)||[];
+  const collocates={};
+  tokens.forEach((t,i)=>{
+    if(t===kw){
+      const window=[...tokens.slice(Math.max(0,i-win),i),...tokens.slice(i+1,i+win+1)];
+      window.forEach(c=>{
+        if(!STOP_WORDS.has(c)&&c!==kw) collocates[c]=(collocates[c]||0)+1;
+      });
+    }
+  });
+  const sorted=Object.entries(collocates).filter(([,c])=>c>=minFreq).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  if(!sorted.length){out('colloc-out',`No collocates found for "${kw}" with min freq ${minFreq}.`);return;}
+  let html=`${h('Collocates of "'+kw+'" (window ±'+win+', min freq '+minFreq+'):\n\n')}`;
+  sorted.forEach(([w,c])=>{
+    html+=`${tag(w,'cyan')} <span style="color:var(--text3);font-size:.7rem;">×${c}</span>  `;
+  });
+  html+=`\n\n${h('MI score note:')} True association strength requires corpus size. These are raw co-occurrence counts.`;
+  out('colloc-out',html);
+}
+
+function calcTTR(){
+  const t=document.getElementById('ttr-in').value.trim()||corpusLoaded;
+  if(!t){out('ttr-out','Load corpus or paste text.');return;}
+  const tokens=tokenize(t);
+  const types=new Set(tokens);
+  const ttr=(types.size/tokens.length*100).toFixed(2);
+  const sents=t.match(/[^.!?]+[.!?]/g)||[t];
+  const avgSentLen=(tokens.length/sents.length).toFixed(1);
+  const avgWordLen=(tokens.reduce((a,w)=>a+w.length,0)/tokens.length).toFixed(2);
+  const chars=t.length;
+  const paragraphs=(t.match(/\n\n/g)||[]).length+1;
+  const hapaxLegomena=[...Object.entries(tokens.reduce((a,w)=>{a[w]=(a[w]||0)+1;return a;},{}))]
+    .filter(([,c])=>c===1).length;
+  out('ttr-out',
+    `${h('Corpus Statistics:')}\n\n`+
+    `${h('Tokens (running words):')} ${tokens.length}\n`+
+    `${h('Types (unique words):')} ${types.size}\n`+
+    `${h('Type-Token Ratio (TTR):')} ${ttr}%\n`+
+    `  ${tag(parseFloat(ttr)>60?'RICH VOCABULARY':parseFloat(ttr)>40?'MODERATE':'REPETITIVE',parseFloat(ttr)>60?'green':parseFloat(ttr)>40?'amber':'pink')}\n\n`+
+    `${h('Sentences:')} ${sents.length}\n`+
+    `${h('Avg Sentence Length:')} ${avgSentLen} words\n`+
+    `${h('Avg Word Length:')} ${avgWordLen} chars\n`+
+    `${h('Characters:')} ${chars}\n`+
+    `${h('Paragraphs (~):')} ${paragraphs}\n`+
+    `${h('Hapax Legomena:')} ${hapaxLegomena} (${(hapaxLegomena/tokens.length*100).toFixed(1)}%)\n`+
+    `  (words appearing only once — measure of lexical richness)\n\n`+
+    `${h('Note:')} TTR is sensitive to text length. For longer texts, use STTR (Standardized TTR).`
+  );
+}
+
+function countSyllablesForWord(word){
+  const w=word.toLowerCase().replace(/[^a-z]/g,'');
+  let c=w.match(/[aeiou]+/g)?.length||1;
+  if(w.endsWith('e')&&c>1) c--;
+  return Math.max(1,c);
+}
+
+function readabilityCalc(){
+  const t=document.getElementById('read-in').value.trim()||corpusLoaded;
+  if(!t){out('read-out','Load corpus or paste text.');return;}
+  const words=tokenize(t);
+  const sents=t.match(/[^.!?]+[.!?]/g)||[t];
+  const syllables=words.reduce((a,w)=>a+countSyllablesForWord(w),0);
+  const N=words.length, S=sents.length, SY=syllables;
+  // Flesch Reading Ease
+  const fre=(206.835-1.015*(N/S)-84.6*(SY/N)).toFixed(1);
+  // Flesch-Kincaid Grade Level
+  const fkgl=(0.39*(N/S)+11.8*(SY/N)-15.59).toFixed(1);
+  // Gunning Fog (simplified - complex words = 3+ syllables)
+  const complexWords=words.filter(w=>countSyllablesForWord(w)>=3).length;
+  const fog=(0.4*((N/S)+(100*complexWords/N))).toFixed(1);
+  // Coleman-Liau (chars based)
+  const chars=words.join('').length;
+  const L=(chars/N*100).toFixed(1);
+  const R=(S/N*100).toFixed(1);
+  const cli=(0.0588*parseFloat(L)-0.296*parseFloat(R)-15.8).toFixed(1);
+  // SMOG
+  const smog=(3+Math.sqrt(complexWords*30/S)).toFixed(1);
+  function freLevel(f){
+    if(f>=90)return{l:'Very Easy',cls:'green'};
+    if(f>=70)return{l:'Easy',cls:'green'};
+    if(f>=60)return{l:'Standard',cls:'amber'};
+    if(f>=50)return{l:'Fairly Difficult',cls:'amber'};
+    if(f>=30)return{l:'Difficult',cls:'pink'};
+    return{l:'Very Difficult',cls:'pink'};
+  }
+  const {l,cls}=freLevel(parseFloat(fre));
+  out('read-out',
+    `${h('Readability Metrics:')}\n\n`+
+    `${h('Flesch Reading Ease:')} ${fre} — ${tag(l,cls)}\n`+
+    `  (100=very easy, 0=very hard; standard prose: 60–70)\n\n`+
+    `${h('Flesch-Kincaid Grade Level:')} ${fkgl}\n`+
+    `  (US school grade required to understand text)\n\n`+
+    `${h('Gunning Fog Index:')} ${fog}\n`+
+    `  (years of education needed; <12 is accessible)\n\n`+
+    `${h('Coleman-Liau Index:')} ${cli}\n`+
+    `  (character-based measure; grade level)\n\n`+
+    `${h('SMOG Index:')} ${smog}\n`+
+    `  (years of education; best for health texts)\n\n`+
+    `${h('Raw Data:')}\n`+
+    `  Words: ${N}  Sentences: ${S}  Syllables: ${SY}\n`+
+    `  Complex words (3+ syl): ${complexWords}  Chars: ${chars}`
+  );
+}
+
+function removeStopWords(){
+  const t=document.getElementById('sw-in').value.trim()||corpusLoaded;
+  if(!t){out('sw-out','Load corpus or paste text.');return;}
+  const words=t.match(/\b\w+\b/g)||[];
+  const filtered=words.filter(w=>!STOP_WORDS.has(w.toLowerCase()));
+  const removed=words.length-filtered.length;
+  out('sw-out',
+    `${h('Original token count:')} ${words.length}\n`+
+    `${h('After stop word removal:')} ${filtered.length}\n`+
+    `${h('Removed:')} ${removed} stop words (${(removed/words.length*100).toFixed(1)}%)\n\n`+
+    `${h('Cleaned text:')}\n${filtered.join(' ')}`
+  );
+}
+
+function showStopWords(){
+  const list=[...STOP_WORDS].sort().slice(0,80);
+  out('sw-out',`${h('Stop Word List (sample of '+list.length+'):\n\n')}${list.map(w=>tag(w,'cyan')).join(' ')}\n\n(Common function words removed during text preprocessing)`);
+}
+
+const LEMMA_MAP={running:'run',runs:'run',ran:'run',walked:'walk',walking:'walk',walks:'walk',went:'go',goes:'go',gone:'go',said:'say',says:'say',saying:'say',ate:'eat',eats:'eat',eating:'eat',children:'child',geese:'goose',mice:'mouse',feet:'foot',teeth:'tooth',men:'man',women:'woman',better:'good',best:'good',worse:'bad',worst:'bad',happier:'happy',happiest:'happy',bigger:'big',biggest:'big',studies:'study',studied:'study',studying:'study',tried:'try',tries:'try',trying:'try',carried:'carry',carries:'carry',was:'be',were:'be',am:'be',are:'be',is:'be',been:'be',being:'be',had:'have',has:'have',did:'do',does:'do',done:'do',cities:'city',countries:'country',companies:'company'};
+
+function lemmaFreq(){
+  const t=document.getElementById('lemma-in').value.trim()||corpusLoaded;
+  if(!t){out('lemma-out','Load corpus or paste text.');return;}
+  const words=tokenize(t);
+  const freq={};
+  words.forEach(w=>{
+    if(STOP_WORDS.has(w)) return;
+    const lemma=LEMMA_MAP[w]||w.replace(/([a-z]+)(ing|ed|er|est|s|ly)$/,(m,s)=>s)||w;
+    freq[lemma]=(freq[lemma]||0)+1;
+  });
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,40);
+  let html=`${h('Lemma Frequency (top '+sorted.length+', stop words excluded):\n\n')}`;
+  const maxF=sorted[0]?.[1]||1;
+  sorted.forEach(([w,c],i)=>{
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin:3px 0;">`;
+    html+=`<span style="width:20px;text-align:right;color:var(--text3);font-size:.7rem;">${i+1}</span>`;
+    html+=`<span style="min-width:120px;color:var(--cyan);">${w}</span>`;
+    html+=`<div style="flex:1;background:rgba(0,212,255,.08);border-radius:2px;height:12px;max-width:160px;">`;
+    html+=`<div style="width:${Math.round(c/maxF*100)}%;height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:2px;"></div></div>`;
+    html+=`<span style="color:var(--text2);font-size:.75rem;">${c}</span>`;
+    html+='</div>';
+  });
+  html+=`\n${h('Note:')} Lemmatization here uses a simplified rule-based approach. Full lemmatization requires a morphological lexicon.`;
+  out('lemma-out',html);
+}
+</script>
+</body>
+</html>
+<footer>
+  <hr>
+  <p>
+    © 2026 <strong>PiPlexion</strong>.<br>
+    This project (including text, interface, and underlying code) is licensed under a
+    <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">
+      Creative Commons Attribution–NonCommercial–NoDerivatives 4.0 International License
+    </a>.
+    <br>
+    Please cite PiPlexion when using this tool for academic or educational purposes.
+    <br>
+  </p>
+</footer>
